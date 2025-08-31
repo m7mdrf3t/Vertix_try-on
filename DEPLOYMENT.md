@@ -35,7 +35,7 @@ This guide explains how to deploy the Vertix Try-On application on Railway with 
 1. Create another service in the same Railway project
 2. Set the **Root Directory** to `/` (root of the repository)
 3. Set the **Build Command** to: `npm run build`
-4. Set the **Start Command** to: `npx serve -s build -l 3000`
+4. Set the **Start Command** to: `npm run serve`
 5. Add the following environment variable:
    - `REACT_APP_API_URL`: The URL of your backend service (e.g., `https://your-backend-service.railway.app`)
 

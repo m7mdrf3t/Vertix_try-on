@@ -102,7 +102,7 @@ This will start both frontend and backend services automatically.
 
 ### Railway Deployment
 
-This project is configured for easy deployment on Railway. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+This project is configured for easy deployment on Railway. See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for simplified deployment instructions.
 
 ### Key Deployment Files
 
