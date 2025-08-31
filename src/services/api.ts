@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { TryOnRequest, TryOnResponse } from '../types';
+import { PredictionRequest, PredictionResponse } from '../types';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 export class VirtualTryOnAPI {
-  static async predict(request: TryOnRequest): Promise<TryOnResponse> {
+  static async predict(request: PredictionRequest): Promise<PredictionResponse> {
     try {
-      const response = await axios.post<TryOnResponse>(
+      const response = await axios.post<PredictionResponse>(
         `${API_BASE_URL}/api/try-on`,
         request,
         {
