@@ -1,7 +1,7 @@
 {
-  "name": "vertix-try-on",
+  "name": "mirrify",
   "version": "1.0.0",
-  "description": "Virtual Try-On Web Application using Google AI Platform",
+  "description": "Virtual Try-On Web Application using Creative spaces",
   "private": true,
   "dependencies": {
     "@types/node": "^16.18.0",

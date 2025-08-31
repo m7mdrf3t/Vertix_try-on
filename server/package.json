@@ -1,7 +1,7 @@
 {
-  "name": "vertix-try-on-server",
+  "name": "mirrify-server",
   "version": "1.0.0",
-  "description": "Backend server for Vertix Try-On application",
+  "description": "Backend server for Mirrify application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

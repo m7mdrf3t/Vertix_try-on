@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { Sparkles } from 'lucide-react';
 import { ImageUpload } from './components/ImageUpload';
 import { ProcessingStatus } from './components/ProcessingStatus';
 import { AdvancedOptions } from './components/AdvancedOptions';
@@ -15,6 +14,8 @@ function App() {
   });
   const [resultImage, setResultImage] = useState<string | undefined>();
   const [parameters, setParameters] = useState<TryOnParameters>({});
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const ctrlPressCountRef = React.useRef(0);
 
   const handleImageUpload = useCallback((image: UploadedImage) => {
     setUploadedImages(prev => [...prev, image]);
@@ -23,6 +24,25 @@ function App() {
   const handleImageRemove = useCallback((id: string) => {
     setUploadedImages(prev => prev.filter(img => img.id !== id));
   }, []);
+
+  // Handle Ctrl key press to show advanced options
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'Control' || event.ctrlKey) {
+      ctrlPressCountRef.current++;
+      if (ctrlPressCountRef.current >= 3) {
+        setShowAdvancedOptions(true);
+        ctrlPressCountRef.current = 0;
+      }
+    }
+  }, []);
+
+  // Add keyboard event listener
+  React.useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
 
   const handleProcess = useCallback(async () => {
     const personImages = uploadedImages.filter(img => img.type === 'person');
@@ -134,11 +154,11 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <Sparkles className="w-8 h-8 text-primary-600" />
-              <h1 className="text-xl font-bold text-gray-900">Vertix Try-On</h1>
+              <img src="/logo.svg" alt="Mirrify Logo" className="w-8 h-8" />
+              <h1 className="text-xl font-bold text-gray-900">Mirrify</h1>
             </div>
             <div className="text-sm text-gray-500">
-              Powered by Google AI Platform
+              by Creative spaces
             </div>
           </div>
         </div>
@@ -177,11 +197,20 @@ function App() {
             />
           </div>
 
-          {/* Advanced Options */}
-          <AdvancedOptions
-            parameters={parameters}
-            onParametersChange={setParameters}
-          />
+          {/* Advanced Options - Hidden by default, shown after 3 Ctrl presses */}
+          {showAdvancedOptions && (
+            <AdvancedOptions
+              parameters={parameters}
+              onParametersChange={setParameters}
+            />
+          )}
+          
+          {/* Hidden feature hint */}
+          {!showAdvancedOptions && (
+            <div className="text-center text-xs text-gray-400 opacity-50">
+              💡 Press Ctrl 3 times to unlock advanced options
+            </div>
+          )}
 
           {/* Process Button */}
           <div className="flex justify-center">
@@ -211,7 +240,7 @@ function App() {
       <footer className="bg-white border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-sm text-gray-500">
-            <p>&copy; 2024 Vertix Try-On. Built with React and Google AI Platform.</p>
+            <p>&copy; 2024 Mirrify. by Creative spaces</p>
           </div>
         </div>
       </footer>

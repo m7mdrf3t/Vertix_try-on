@@ -1,12 +1,12 @@
 # Railway Deployment Guide (Simplified)
 
-This guide provides a simple approach to deploy your Vertix Try-On application on Railway without nginx proxy complications. The frontend will directly call the backend API using environment variables.
+This guide provides a simple approach to deploy your Mirrify application on Railway without nginx proxy complications. The frontend will directly call the backend API using environment variables.
 
 ## Project Structure
 
 Your project is a monorepo with the following structure:
 ```
-Vertix_try-on/              # Root folder (Frontend)
+Mirrify/                    # Root folder (Frontend)
 ├── src/                    # React application
 ├── package.json            # Frontend dependencies
 ├── server/                 # Backend folder

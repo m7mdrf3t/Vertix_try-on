@@ -1,6 +1,6 @@
 # Railway Deployment Guide
 
-This guide explains how to deploy the Vertix Try-On application on Railway with both frontend and backend services.
+This guide explains how to deploy the Mirrify application on Railway with both frontend and backend services.
 
 ## Prerequisites
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Setting up Vertix Try-On Application..."
+echo "🚀 Setting up Mirrify Application..."
 
 # Check if Node.js is installed
 if ! command -v node &> /dev/null; then

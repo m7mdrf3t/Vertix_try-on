@@ -98,7 +98,7 @@ app.post('/api/try-on', async (req, res) => {
 
     res.json(response.data);
   } catch (error) {
-    console.error('Error calling Google AI Platform:', error.response?.data || error.message);
+    console.error('Error calling Creative spaces API:', error.response?.data || error.message);
     res.status(error.response?.status || 500).json({
       error: error.response?.data?.error?.message || 'Internal server error',
     });

@@ -1,10 +1,10 @@
-# Vertix Try-On
+# Mirrify
 
-A virtual try-on web application powered by Google AI Platform that allows users to see how clothing items would look on them by uploading person and product images.
+A virtual try-on web application powered by Creative spaces that allows users to see how clothing items would look on them by uploading person and product images.
 
 ## Features
 
-- 🎨 Virtual try-on using Google AI Platform
+- 🎨 Virtual try-on using Creative spaces
 - 📱 Responsive design with Tailwind CSS
 - 🔄 Real-time processing status
 - 📤 Drag & drop image upload
@@ -14,7 +14,7 @@ A virtual try-on web application powered by Google AI Platform that allows users
 ## Project Structure
 
 ```
-Vertix_try-on/
+Mirrify/
 ├── src/                    # Frontend React application
 │   ├── components/         # React components
 │   ├── services/          # API services
