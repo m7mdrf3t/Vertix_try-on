@@ -50,6 +50,19 @@ async function getAccessToken() {
   }
 }
 
+// Root endpoint for debugging
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Backend server is running',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth/token',
+      tryOn: '/api/try-on'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });

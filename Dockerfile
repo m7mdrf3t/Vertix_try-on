@@ -28,4 +28,4 @@ COPY --from=builder /app/build /app/build
 EXPOSE $PORT
 
 # Start the application
-CMD ["sh", "-c", "serve -s build -l $PORT"]
+CMD ["sh", "-c", "serve -s build -l ${PORT:-3000}"]

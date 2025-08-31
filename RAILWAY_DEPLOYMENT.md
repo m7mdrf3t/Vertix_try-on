@@ -2,6 +2,19 @@
 
 This guide provides a simple approach to deploy your Vertix Try-On application on Railway without nginx proxy complications. The frontend will directly call the backend API using environment variables.
 
+## Project Structure
+
+Your project is a monorepo with the following structure:
+```
+Vertix_try-on/              # Root folder (Frontend)
+├── src/                    # React application
+├── package.json            # Frontend dependencies
+├── server/                 # Backend folder
+│   ├── server.js           # Express server
+│   └── package.json        # Backend dependencies
+└── ...other files
+```
+
 ## Prerequisites
 
 1. Railway account
@@ -17,7 +30,7 @@ This guide provides a simple approach to deploy your Vertix Try-On application o
 3. **Create a new service for the backend:**
    - Click "New Service" → "GitHub Repo"
    - Select your repository
-   - Set **Root Directory** to: `server`
+   - Set **Root Directory** to: `server` (this tells Railway to use the server folder)
    - Set **Build Command** to: `npm install`
    - Set **Start Command** to: `npm start`
 
@@ -34,7 +47,7 @@ This guide provides a simple approach to deploy your Vertix Try-On application o
 1. **In the same Railway project, create another service:**
    - Click "New Service" → "GitHub Repo"
    - Select the same repository
-   - Set **Root Directory** to: `/` (leave empty for root)
+   - Set **Root Directory** to: `/` (leave empty for root - this uses the main project folder)
    - Set **Build Command** to: `npm run build`
    - Set **Start Command** to: `npm run serve`
 
@@ -88,6 +101,8 @@ If you prefer to deploy as a single service, you can use the `docker-compose.yml
 3. Railway will automatically detect the `docker-compose.yml` file
 4. Add the required environment variables
 5. Deploy
+
+**Note**: The docker-compose approach will deploy both frontend and backend as separate containers within the same service.
 
 ## Local Testing
 
