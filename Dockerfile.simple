@@ -24,8 +24,13 @@ RUN npm install -g serve
 # Copy built files from builder stage
 COPY --from=builder /app/build /app/build
 
-# Expose port (Railway will set the PORT environment variable)
+# Create a startup script
+RUN echo '#!/bin/sh\n\
+echo "Starting server on port $PORT"\n\
+serve -s build -l $PORT' > /start.sh && chmod +x /start.sh
+
+# Expose port
 EXPOSE $PORT
 
 # Start the application
-CMD ["serve", "-s", "build", "-l", "3000"]
+CMD ["/start.sh"]
