@@ -1,6 +1,6 @@
 # Railway Deployment Guide (Simplified)
 
-This guide provides a simple approach to deploy your Vertix Try-On application on Railway without nginx proxy complications.
+This guide provides a simple approach to deploy your Vertix Try-On application on Railway without nginx proxy complications. The frontend will directly call the backend API using environment variables.
 
 ## Prerequisites
 
@@ -40,6 +40,7 @@ This guide provides a simple approach to deploy your Vertix Try-On application o
 
 2. **Add Environment Variable:**
    - `REACT_APP_API_URL`: The URL of your backend service (e.g., `https://your-backend-service.railway.app`)
+   - `PORT`: Railway will set this automatically
 
 3. **Deploy the frontend service**
 

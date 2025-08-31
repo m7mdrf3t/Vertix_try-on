@@ -16,16 +16,16 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+FROM node:18-alpine
+
+# Install serve globally
+RUN npm install -g serve
 
 # Copy built files from builder stage
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/build /app/build
 
-# Copy nginx configuration
-COPY nginx.railway.conf /etc/nginx/nginx.conf
+# Expose port (Railway will set the PORT environment variable)
+EXPOSE $PORT
 
-# Expose port
-EXPOSE 80
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the application
+CMD ["sh", "-c", "serve -s build -l $PORT"]
