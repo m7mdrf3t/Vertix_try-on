@@ -16,16 +16,16 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine
-
-# Install serve globally
-RUN npm install -g serve
+FROM nginx:alpine
 
 # Copy built files from builder stage
-COPY --from=builder /app/build /app/build
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Copy simple nginx config
+COPY nginx.simple.conf /etc/nginx/nginx.conf
 
 # Expose port 8080 for Railway
 EXPOSE 8080
 
-# Start the application
-CMD ["sh", "-c", "serve -s build -l 8080"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
