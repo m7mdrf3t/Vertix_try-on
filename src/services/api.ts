@@ -3,11 +3,15 @@ import { PredictionRequest, PredictionResponse } from '../types';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
+// Debug: Log the API URL being used
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('Environment variable:', process.env.REACT_APP_API_URL);
+
 export class VirtualTryOnAPI {
   static async predict(request: PredictionRequest): Promise<PredictionResponse> {
     try {
       const response = await axios.post<PredictionResponse>(
-        `${API_BASE_URL}/api/try-on`,
+        `https://charming-wisdom-production.up.railway.app/api/try-on`,
         request,
         {
           headers: {
