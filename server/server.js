@@ -12,7 +12,8 @@ const PORT = process.env.PORT || 3001;
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3002',
-  process.env.FRONTEND_URL, // Add your Railway frontend URL here
+  'https://mirrify-creativespaces.up.railway.app', // Your Railway frontend domain
+  process.env.FRONTEND_URL, // Fallback for environment variable
 ];
 
 app.use(cors({
@@ -20,9 +21,12 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // For production, allow your specific domains
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      // Log blocked origins for debugging
+      console.log('CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
