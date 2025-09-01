@@ -154,7 +154,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <img src="/logo.svg" alt="Mirrify Logo" className="w-8 h-8" />
+              <img src="/Mirrify.jpg" alt="Mirrify Logo" className="w-8 h-8 rounded-full" />
               <h1 className="text-xl font-bold text-gray-900">Mirrify</h1>
             </div>
             <div className="text-sm text-gray-500">
