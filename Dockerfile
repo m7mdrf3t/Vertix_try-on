@@ -28,4 +28,4 @@ COPY --from=builder /app/build /app/build
 EXPOSE 8080
 
 # Start the application
-CMD ["sh", "-c", "serve -s build -l 8080"]
+CMD ["serve", "-s", "build", "-l", "8080"]
