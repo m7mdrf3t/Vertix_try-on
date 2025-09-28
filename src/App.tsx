@@ -184,9 +184,6 @@ function App() {
               <img src="/Mirrify.jpg" alt="Mirrify Logo" className="w-8 h-8 rounded-full" />
               <h1 className="text-xl font-bold text-gray-900">Mirrify</h1>
             </div>
-            <div className="text-sm text-gray-500">
-              by Creative spaces
-            </div>
           </div>
         </div>
       </header>
@@ -200,8 +197,7 @@ function App() {
               Virtual Try-On Experience
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Upload a person's photo and product images to see how they would look wearing the products.
-              Our AI-powered virtual try-on technology provides realistic results.
+              Try It On, Virtually Stop guessing! Just upload your photo and choose a product image to get a realistic visual of how it fits and looks on you. Thanks to our sophisticated AI, what you see is what you get.
             </p>
           </div>
 
@@ -210,7 +206,7 @@ function App() {
           {/* Image Upload and Product Selection Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Person Image</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Your Image</h3>
               <ImageUpload
                 onImageUpload={handleImageUpload}
                 onImageRemove={handleImageRemove}
@@ -238,12 +234,6 @@ function App() {
             />
           )}
           
-          {/* Hidden feature hint */}
-          {!showAdvancedOptions && (
-            <div className="text-center text-xs text-gray-400 opacity-50">
-              💡 Press Ctrl 3 times to unlock advanced options
-            </div>
-          )}
 
           {/* Process Button */}
           <div className="flex justify-center">
@@ -273,7 +263,7 @@ function App() {
       <footer className="bg-white border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-sm text-gray-500">
-            <p>&copy; 2024 Mirrify. by Creative spaces</p>
+            <p>&copy; 2024 Mirrify</p>
           </div>
         </div>
       </footer>

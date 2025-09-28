@@ -97,7 +97,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         <Upload className="mx-auto h-12 w-12 text-gray-400" />
         <div className="mt-4">
           <p className="text-lg font-medium text-gray-900">
-            Upload {type === 'person' ? 'Person' : 'Product'} Images
+            Upload {type === 'person' ? 'Your' : 'Product'} Image{type === 'product' ? 's' : ''}
           </p>
           <p className="text-sm text-gray-500">
             {isDisabled
