@@ -91,13 +91,15 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
 
   const handleProductClick = useCallback((product: Product) => {
     const isSelected = selectedProducts.some(p => p.id === product.id);
-    
+
     if (isSelected) {
       onProductRemove(product.id);
-    } else if (selectedProducts.length < maxProducts) {
+    } else {
+      // Always select the clicked product. If a product is already selected and maxProducts is 1,
+      // the parent will replace the current selection.
       onProductSelect(product);
     }
-  }, [onProductSelect, onProductRemove, selectedProducts, maxProducts]);
+  }, [onProductSelect, onProductRemove, selectedProducts]);
 
   const isProductSelected = (productId: string) => {
     return selectedProducts.some(p => p.id === productId);
@@ -167,7 +169,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 {filteredProducts.map((product) => {
                   const isSelected = isProductSelected(product.id);
-                  const canSelect = !isSelected && selectedProducts.length < maxProducts;
+                  const canSelect = true;
                   
                   return (
                     <div
@@ -176,9 +178,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                       className={`relative rounded-lg border-2 transition-all cursor-pointer ${
                         isSelected
                           ? 'border-blue-500 bg-blue-50'
-                          : canSelect
-                          ? 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                          : 'border-gray-200 opacity-50 cursor-not-allowed'
+                          : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                       }`}
                     >
                       {/* Product Image */}
@@ -217,11 +217,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                       </div>
 
                       {/* Selection Status */}
-                      {!canSelect && !isSelected && (
-                        <div className="absolute inset-0 bg-gray-100 bg-opacity-75 rounded-lg flex items-center justify-center">
-                          <span className="text-xs text-gray-500 font-medium">Max {maxProducts}</span>
-                        </div>
-                      )}
+                      {/* With single-select replace behavior, we never hard-disable cards */}
                     </div>
                   );
                 })}

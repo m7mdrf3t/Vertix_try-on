@@ -28,7 +28,8 @@ function App() {
   }, []);
 
   const handleProductSelect = useCallback((product: Product) => {
-    setSelectedProducts(prev => [...prev, product]);
+    // Enforce single selection: always replace with the newly selected product
+    setSelectedProducts([product]);
   }, []);
 
   const handleProductRemove = useCallback((productId: string) => {
@@ -218,12 +219,12 @@ function App() {
               />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Select Products</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Select Product</h3>
               <ProductSelector
                 onProductSelect={handleProductSelect}
                 onProductRemove={handleProductRemove}
                 selectedProducts={selectedProducts}
-                maxProducts={5}
+                maxProducts={1}
               />
             </div>
           </div>
