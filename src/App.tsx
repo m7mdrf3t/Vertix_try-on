@@ -216,6 +216,7 @@ function App() {
                 onImageRemove={handleImageRemove}
                 uploadedImages={uploadedImages}
                 type="person"
+                maxImages={1}
               />
             </div>
             <div>

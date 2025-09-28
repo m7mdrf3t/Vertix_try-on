@@ -19,6 +19,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Determine disabled state for the upload area (e.g., allow only one person image)
+  const currentTypeImagesCount = uploadedImages.filter(img => img.type === type).length;
+  const isDisabled = !!maxImages && currentTypeImagesCount >= maxImages;
+  const alwaysShowRemove = type === 'person';
+
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
@@ -47,6 +52,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   }, [onImageUpload, type, maxImages, uploadedImages]);
 
   const handleDragOver = useCallback((event: React.DragEvent) => {
+    // Prevent default to allow drop, but do nothing further if disabled
     event.preventDefault();
   }, []);
 
@@ -81,19 +87,22 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <div className="space-y-6">
       {/* Upload Area */}
-      <div
-        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-      >
+      {!isDisabled && (
+        <div
+          className={"border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+        >
         <Upload className="mx-auto h-12 w-12 text-gray-400" />
         <div className="mt-4">
           <p className="text-lg font-medium text-gray-900">
             Upload {type === 'person' ? 'Person' : 'Product'} Images
           </p>
           <p className="text-sm text-gray-500">
-            Drag and drop images here, or click to select files
+            {isDisabled
+              ? 'Maximum reached. Remove an image to upload a new one.'
+              : 'Drag and drop images here, or click to select files'}
             {maxImages && (
               <span className="block mt-1">
                 Max {maxImages} {type === 'person' ? 'person' : 'product'} image{maxImages > 1 ? 's' : ''}
@@ -109,7 +118,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           onChange={handleFileSelect}
           className="hidden"
         />
-      </div>
+
+        </div>
+      )}
 
       {/* Uploaded Images */}
       {uploadedImages.filter(img => img.type === type).length > 0 && (
@@ -142,7 +153,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 {/* Remove Button */}
                 <button
                   onClick={() => onImageRemove(image.id)}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className={`absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 transition-opacity ${alwaysShowRemove ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                 >
                   <X className="h-4 w-4" />
                 </button>

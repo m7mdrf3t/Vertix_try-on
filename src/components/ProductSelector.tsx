@@ -99,6 +99,8 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
       // the parent will replace the current selection.
       onProductSelect(product);
     }
+    // Collapse the dropdown after a selection action
+    setIsOpen(false);
   }, [onProductSelect, onProductRemove, selectedProducts]);
 
   const isProductSelected = (productId: string) => {
