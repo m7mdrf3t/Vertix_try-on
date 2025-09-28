@@ -235,8 +235,8 @@ function App() {
           )}
           
 
-          {/* Process Buttons */}
-          <div className="flex justify-center gap-4">
+          {/* Process Button */}
+          <div className="flex justify-center">
             <button
               onClick={handleProcess}
               disabled={!canProcess || processingState.isProcessing}
@@ -247,20 +247,6 @@ function App() {
               }`}
             >
               {processingState.isProcessing ? 'Processing...' : 'Try-On'}
-            </button>
-            <button
-              onClick={() => {
-                // Add to cart functionality - placeholder for now
-                alert('Add to cart functionality coming soon!');
-              }}
-              disabled={!canProcess || processingState.isProcessing}
-              className={`px-8 py-3 rounded-lg font-medium transition-colors ${
-                canProcess && !processingState.isProcessing
-                  ? 'bg-green-600 text-white hover:bg-green-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              Add to Cart
             </button>
           </div>
 

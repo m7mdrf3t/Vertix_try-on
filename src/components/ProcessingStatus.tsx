@@ -85,13 +85,24 @@ export const ProcessingStatus: React.FC<ProcessingStatusProps> = ({
           </div>
 
           {onDownload && (
-            <button
-              onClick={onDownload}
-              className="flex items-center justify-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span>Download Result</span>
-            </button>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={onDownload}
+                className="flex items-center justify-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download Result</span>
+              </button>
+              <button
+                onClick={() => {
+                  // Add to cart functionality - placeholder for now
+                  alert('Add to cart functionality coming soon!');
+                }}
+                className="flex items-center justify-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <span>Add to Cart</span>
+              </button>
+            </div>
           )}
         </div>
       )}
