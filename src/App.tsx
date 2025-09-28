@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { ImageUpload } from './components/ImageUpload';
+import { ProductSelector } from './components/ProductSelector';
 import { ProcessingStatus } from './components/ProcessingStatus';
 import { AdvancedOptions } from './components/AdvancedOptions';
 import { VirtualTryOnAPI } from './services/api';
-import { UploadedImage, ProcessingState, TryOnParameters } from './types';
+import { UploadedImage, Product, ProcessingState, TryOnParameters } from './types';
 
 function App() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [processingState, setProcessingState] = useState<ProcessingState>({
     isProcessing: false,
     progress: 0,
@@ -23,6 +25,14 @@ function App() {
 
   const handleImageRemove = useCallback((id: string) => {
     setUploadedImages(prev => prev.filter(img => img.id !== id));
+  }, []);
+
+  const handleProductSelect = useCallback((product: Product) => {
+    setSelectedProducts(prev => [...prev, product]);
+  }, []);
+
+  const handleProductRemove = useCallback((productId: string) => {
+    setSelectedProducts(prev => prev.filter(p => p.id !== productId));
   }, []);
 
   // Handle Ctrl key press to show advanced options
@@ -44,9 +54,25 @@ function App() {
     };
   }, [handleKeyDown]);
 
+  // Helper function to convert image URL to base64
+  const convertImageUrlToBase64 = async (imageUrl: string): Promise<string> => {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        // Remove data:image/jpeg;base64, prefix
+        const base64Data = base64.split(',')[1];
+        resolve(base64Data);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
   const handleProcess = useCallback(async () => {
     const personImages = uploadedImages.filter(img => img.type === 'person');
-    const productImages = uploadedImages.filter(img => img.type === 'product');
 
     if (personImages.length === 0) {
       setProcessingState({
@@ -57,11 +83,11 @@ function App() {
       return;
     }
 
-    if (productImages.length === 0) {
+    if (selectedProducts.length === 0) {
       setProcessingState({
         isProcessing: false,
         progress: 0,
-        error: 'Please upload at least one product image',
+        error: 'Please select at least one product',
       });
       return;
     }
@@ -85,7 +111,7 @@ function App() {
       // Convert images to base64
       const personImageBase64 = await VirtualTryOnAPI.convertImageToBase64(personImages[0].file);
       const productImagesBase64 = await Promise.all(
-        productImages.map(img => VirtualTryOnAPI.convertImageToBase64(img.file))
+        selectedProducts.map(product => convertImageUrlToBase64(product.image))
       );
 
       // Prepare request
@@ -131,7 +157,7 @@ function App() {
         error: error instanceof Error ? error.message : 'An unknown error occurred',
       });
     }
-  }, [uploadedImages, parameters]);
+  }, [uploadedImages, selectedProducts, parameters]);
 
   const handleDownload = useCallback(() => {
     if (!resultImage) return;
@@ -145,7 +171,7 @@ function App() {
   }, [resultImage]);
 
   const canProcess = uploadedImages.filter(img => img.type === 'person').length > 0 &&
-                    uploadedImages.filter(img => img.type === 'product').length > 0;
+                    selectedProducts.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -180,21 +206,26 @@ function App() {
 
 
 
-          {/* Image Upload Section */}
+          {/* Image Upload and Product Selection Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <ImageUpload
-              onImageUpload={handleImageUpload}
-              onImageRemove={handleImageRemove}
-              uploadedImages={uploadedImages}
-              type="person"
-            />
-            <ImageUpload
-              onImageUpload={handleImageUpload}
-              onImageRemove={handleImageRemove}
-              uploadedImages={uploadedImages}
-              type="product"
-              maxImages={5}
-            />
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Person Image</h3>
+              <ImageUpload
+                onImageUpload={handleImageUpload}
+                onImageRemove={handleImageRemove}
+                uploadedImages={uploadedImages}
+                type="person"
+              />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Select Products</h3>
+              <ProductSelector
+                onProductSelect={handleProductSelect}
+                onProductRemove={handleProductRemove}
+                selectedProducts={selectedProducts}
+                maxProducts={5}
+              />
+            </div>
           </div>
 
           {/* Advanced Options - Hidden by default, shown after 3 Ctrl presses */}

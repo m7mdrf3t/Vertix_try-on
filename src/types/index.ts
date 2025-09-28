@@ -6,6 +6,15 @@ export interface UploadedImage {
   name: string;
 }
 
+export interface Product {
+  id: string;
+  name: string;
+  image: string;
+  category: string;
+  price?: string;
+  description?: string;
+}
+
 export interface ProcessingState {
   isProcessing: boolean;
   progress: number;
