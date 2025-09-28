@@ -171,7 +171,6 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 {filteredProducts.map((product) => {
                   const isSelected = isProductSelected(product.id);
-                  const canSelect = true;
                   
                   return (
                     <div
