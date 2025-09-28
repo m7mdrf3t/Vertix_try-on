@@ -194,10 +194,10 @@ function App() {
           {/* Welcome Section */}
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Virtual Try-On Experience
+              Try It On, Virtually
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Try It On, Virtually Stop guessing! Just upload your photo and choose a product image to get a realistic visual of how it fits and looks on you. Thanks to our sophisticated AI, what you see is what you get.
+              Stop guessing! Just upload your photo and choose a product image to get a realistic visual of how it fits and looks on you. Thanks to our sophisticated AI, what you see is what you get.
             </p>
           </div>
 
@@ -235,8 +235,8 @@ function App() {
           )}
           
 
-          {/* Process Button */}
-          <div className="flex justify-center">
+          {/* Process Buttons */}
+          <div className="flex justify-center gap-4">
             <button
               onClick={handleProcess}
               disabled={!canProcess || processingState.isProcessing}
@@ -246,7 +246,21 @@ function App() {
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              {processingState.isProcessing ? 'Processing...' : 'Generate Virtual Try-On'}
+              {processingState.isProcessing ? 'Processing...' : 'Try-On'}
+            </button>
+            <button
+              onClick={() => {
+                // Add to cart functionality - placeholder for now
+                alert('Add to cart functionality coming soon!');
+              }}
+              disabled={!canProcess || processingState.isProcessing}
+              className={`px-8 py-3 rounded-lg font-medium transition-colors ${
+                canProcess && !processingState.isProcessing
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              Add to Cart
             </button>
           </div>
 
