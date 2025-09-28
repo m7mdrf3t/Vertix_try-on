@@ -134,7 +134,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
             <span className="text-sm font-medium text-gray-700">
               {selectedProducts.length > 0 
                 ? `${selectedProducts.length} product${selectedProducts.length > 1 ? 's' : ''} selected`
-                : 'Select products...'
+                : 'Select product...'
               }
             </span>
           </div>
