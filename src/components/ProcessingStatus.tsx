@@ -96,7 +96,7 @@ export const ProcessingStatus: React.FC<ProcessingStatusProps> = ({
               <button
                 onClick={() => {
                   // Add to cart functionality - placeholder for now
-                  alert('Add to cart functionality coming soon!');
+                  alert('Product Add to cart!');
                 }}
                 className="flex items-center justify-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
