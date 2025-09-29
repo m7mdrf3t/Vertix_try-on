@@ -78,11 +78,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     });
   }, [onImageUpload, type, maxImages, uploadedImages]);
 
-  const changeImageType = useCallback((id: string, newType: 'person' | 'product') => {
-    // This would need to be handled by the parent component
-    // For now, we'll just update the local state
-    console.log(`Changing image ${id} type to ${newType}`);
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -97,7 +92,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         <Upload className="mx-auto h-12 w-12 text-gray-400" />
         <div className="mt-4">
           <p className="text-lg font-medium text-gray-900">
-            Upload {type === 'person' ? 'Your' : 'Product'} Image{type === 'product' ? 's' : ''}
+            {type === 'person' ? 'Upload Your Image' : 'Upload Product Images'}
           </p>
           <p className="text-sm text-gray-500">
             {isDisabled
@@ -125,7 +120,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       {/* Uploaded Images */}
       {uploadedImages.filter(img => img.type === type).length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">Uploaded {type === 'person' ? 'Person' : 'Product'} Images</h3>
+          <h3 className="text-lg font-medium text-gray-900">Uploaded Image</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {uploadedImages.filter(img => img.type === type).map((image) => (
               <div key={image.id} className="relative group">
@@ -137,18 +132,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                   />
                 </div>
                 
-                {/* Image Type Selector */}
-                <div className="absolute top-2 left-2">
-                  <select
-                    value={image.type}
-                    onChange={(e) => changeImageType(image.id, e.target.value as 'person' | 'product')}
-                    className="text-xs bg-white/90 backdrop-blur-sm border border-gray-300 rounded px-2 py-1"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <option value="person">Person</option>
-                    <option value="product">Product</option>
-                  </select>
-                </div>
 
                 {/* Remove Button */}
                 <button
@@ -161,13 +144,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 {/* Image Name */}
                 <div className="mt-2">
                   <p className="text-sm text-gray-600 truncate">{image.name}</p>
-                  <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                    image.type === 'person' 
-                      ? 'bg-blue-100 text-blue-800' 
-                      : 'bg-green-100 text-green-800'
-                  }`}>
-                    {image.type}
-                  </span>
                 </div>
               </div>
             ))}

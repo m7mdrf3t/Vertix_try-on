@@ -241,7 +241,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
       {selectedProducts.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-gray-700">Selected Products</h4>
+            <h4 className="text-sm font-medium text-gray-700">Selected Product</h4>
             <button
               onClick={() => selectedProducts.forEach(p => onProductRemove(p.id))}
               className="text-xs text-red-600 hover:text-red-800"
@@ -250,7 +250,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
             </button>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {selectedProducts.map((product) => (
               <div key={product.id} className="relative group">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
@@ -267,16 +267,16 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                 {/* Remove Button */}
                 <button
                   onClick={() => onProductRemove(product.id)}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-4 w-4" />
                 </button>
 
                 {/* Product Name */}
                 <div className="mt-2">
-                  <p className="text-xs text-gray-600 truncate">{product.name}</p>
+                  <p className="text-sm text-gray-600 truncate">{product.name}</p>
                   {product.price && (
-                    <p className="text-xs font-semibold text-gray-900">{product.price}</p>
+                    <p className="text-sm font-semibold text-gray-900">{product.price}</p>
                   )}
                 </div>
               </div>

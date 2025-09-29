@@ -197,7 +197,7 @@ function App() {
               Try It On, Virtually
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Stop guessing! Just upload your photo and choose a product image to get a realistic visual of how it fits and looks on you. Thanks to our sophisticated AI, what you see is what you get.
+              Stop guessing! Just upload your photo and choose a product image to get a realistic visual of how it fits and looks on you.
             </p>
           </div>
 
@@ -206,7 +206,7 @@ function App() {
           {/* Image Upload and Product Selection Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Your Image</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Your Image Uploader</h3>
               <ImageUpload
                 onImageUpload={handleImageUpload}
                 onImageRemove={handleImageRemove}
