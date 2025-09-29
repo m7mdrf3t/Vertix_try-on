@@ -241,7 +241,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
       {selectedProducts.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-gray-700">Selected Product</h4>
+            <h4 className="text-sm font-medium text-gray-700">Product selected</h4>
             <button
               onClick={() => selectedProducts.forEach(p => onProductRemove(p.id))}
               className="text-xs text-red-600 hover:text-red-800"

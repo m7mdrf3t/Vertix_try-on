@@ -120,7 +120,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       {/* Uploaded Images */}
       {uploadedImages.filter(img => img.type === type).length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">Uploaded Image</h3>
+          <h4 className="text-sm font-medium text-gray-700">Image Uploaded</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {uploadedImages.filter(img => img.type === type).map((image) => (
               <div key={image.id} className="relative group">
@@ -141,10 +141,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                   <X className="h-4 w-4" />
                 </button>
 
-                {/* Image Name */}
-                <div className="mt-2">
-                  <p className="text-sm text-gray-600 truncate">{image.name}</p>
-                </div>
               </div>
             ))}
           </div>
