@@ -24,6 +24,7 @@ Create columns with these headers in the first row:
 | id | name | image | category | price | description |
 |----|------|-------|----------|-------|-------------|
 | shirt-1 | Classic White Shirt | /products/white-shirt.jpg | Shirts | $29.99 | Classic white cotton shirt |
+| shirt-2 | Blue Denim Shirt | https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400 | Shirts | $34.99 | Comfortable blue denim shirt |
 | shirt-2 | Blue Denim Shirt | /products/blue-shirt.jpg | Shirts | $34.99 | Comfortable blue denim shirt |
 
 ### 3. Make the Sheet Public
@@ -67,6 +68,25 @@ The app supports flexible column names:
 | Category | `category`, `Category`, `CATEGORY` |
 | Price | `price`, `Price`, `PRICE` |
 | Description | `description`, `Description`, `DESCRIPTION` |
+
+## 🖼️ Image Handling
+
+The app supports **both local file paths and URLs** for images:
+
+### Local Paths (relative to public folder):
+- `/products/white-shirt.jpg`
+- `/images/product1.png`
+- `products/blue-shirt.jpg`
+
+### External URLs:
+- `https://images.unsplash.com/photo-1234567890?w=400`
+- `https://example.com/images/product.jpg`
+- `https://cdn.example.com/products/shoes.png`
+
+### Data URLs (base64 encoded):
+- `data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ...`
+
+The app automatically detects the image type and handles it appropriately.
 
 ## 🚀 Testing
 

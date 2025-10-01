@@ -2,6 +2,20 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Check, ShoppingBag, ChevronDown, X } from 'lucide-react';
 import { CSVService } from '../services/csvService';
 
+// Helper function to determine if image is a URL or local path
+const getImageSrc = (imagePath: string): string => {
+  // Check if it's a URL (starts with http:// or https://)
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  // Check if it's a data URL (starts with data:)
+  if (imagePath.startsWith('data:')) {
+    return imagePath;
+  }
+  // Otherwise, treat as local path
+  return imagePath;
+};
+
 export interface Product {
   id: string;
   name: string;
@@ -170,7 +184,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                           {/* Product Image */}
                           <div className="aspect-square rounded-t-lg overflow-hidden bg-gray-100">
                             <img
-                              src={product.image}
+                              src={getImageSrc(product.image)}
                               alt={product.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
@@ -242,7 +256,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
               <div key={product.id} className="relative group">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
                   <img
-                    src={product.image}
+                    src={getImageSrc(product.image)}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {

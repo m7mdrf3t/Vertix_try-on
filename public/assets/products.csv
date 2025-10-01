@@ -1,0 +1,7 @@
+id,name,image,category,price,description
+shirt-1,Classic White Shirt,/products/white-shirt.jpg,Shirts,$29.99,Classic white cotton shirt
+shirt-2,Blue Denim Shirt,https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400,Shirts,$34.99,Comfortable blue denim shirt
+dress-1,Summer Dress,https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400,Dresses,$49.99,Light and breezy summer dress
+jacket-1,Leather Jacket,/products/leather-jacket.jpg,Jackets,$89.99,Classic black leather jacket
+sweater-1,Cozy Sweater,https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400,Sweaters,$39.99,Warm and cozy knit sweater
+pants-1,Black Pants,/products/black-pants.jpg,Pants,$44.99,Professional black trousers
