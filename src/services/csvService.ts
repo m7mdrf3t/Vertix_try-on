@@ -14,21 +14,11 @@ export interface CSVProduct {
 export class CSVService {
   static async loadProducts(): Promise<Product[]> {
     try {
-      // Try to load from Google Sheets first, then Excel, then CSV
-      try {
-        return await this.loadProductsFromGoogleSheets();
-      } catch (googleSheetsError) {
-        console.log('Google Sheets not configured, trying Excel...');
-        try {
-          return await this.loadProductsFromExcel();
-        } catch (excelError) {
-          console.log('Excel file not found, trying CSV...');
-          return await this.loadProductsFromCSV();
-        }
-      }
+      // Only load from Google Sheets - no fallback to local files
+      return await this.loadProductsFromGoogleSheets();
     } catch (error) {
-      console.error('Error loading products:', error);
-      throw error;
+      console.error('Error loading products from Google Sheets:', error);
+      throw new Error('Failed to load products from Google Sheets. Please check your REACT_APP_GOOGLE_SHEETS_URL configuration.');
     }
   }
 

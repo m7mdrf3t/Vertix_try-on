@@ -1,7 +1,0 @@
-id,name,image,category,price,description
-shirt-1,Classic White Shirt,/products/white-shirt.jpg,Shirts,$29.99,Classic white cotton shirt
-shirt-2,Blue Denim Shirt,/products/blue-shirt.jpg,Shirts,$34.99,Comfortable blue denim shirt
-dress-1,Summer Dress,/products/leather-jacket.jpg,Dresses,$49.99,Light and breezy summer dress
-jacket-1,Leather Jacket,/products/summer-dress.jpg,Jackets,$89.99,Classic black leather jacket
-sweater-1,Cozy Sweater,/products/sweater.jpg,$39.99,Warm and cozy knit sweater
-pants-1,Black Pants,/products/black-pants.jpg,Pants,$44.99,Professional black trousers

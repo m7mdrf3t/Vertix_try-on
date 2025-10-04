@@ -58,7 +58,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
         setProducts(loadedProducts);
       } catch (err) {
         console.error('Failed to load products:', err);
-        setError('Failed to load products. Please check the CSV file.');
+        setError('Failed to load products from Google Sheets. Please check your Google Sheets configuration.');
       } finally {
         setLoading(false);
       }
@@ -163,7 +163,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
               ) : error ? (
                 <div className="text-center py-8">
                   <p className="text-sm text-red-500">{error}</p>
-                  <p className="text-xs text-gray-400 mt-1">Please check the CSV file in /public/assets/products.csv</p>
+                  <p className="text-xs text-gray-400 mt-1">Please set REACT_APP_GOOGLE_SHEETS_URL and ensure your Google Sheet is published to web</p>
                 </div>
               ) : (
                 <>
@@ -186,7 +186,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                             <img
                               src={getImageSrc(product.image)}
                               alt={product.name}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                               onError={(e) => {
                                 // Fallback for missing images
                                 e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==';
@@ -258,7 +258,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                   <img
                     src={getImageSrc(product.image)}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     onError={(e) => {
                       e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==';
                     }}
