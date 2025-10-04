@@ -130,9 +130,9 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
 
         {/* Dropdown Content */}
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 flex flex-col">
             {/* Search and Filter */}
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-4 border-b border-gray-200 flex-shrink-0">
               <div className="space-y-3">
                 <input
                   type="text"
@@ -154,7 +154,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
             </div>
 
             {/* Product Grid */}
-            <div className="p-4 max-h-80 overflow-y-auto">
+            <div className="px-4 pt-4 pb-6 flex-1 overflow-y-auto">
               {loading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
