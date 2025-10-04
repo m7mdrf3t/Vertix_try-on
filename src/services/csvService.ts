@@ -14,11 +14,13 @@ export interface CSVProduct {
 export class CSVService {
   static async loadProducts(): Promise<Product[]> {
     try {
-      // Only load from Google Sheets - no fallback to local files
+      // Always try to load from Google Sheets first (with fallback URL)
+      console.log('Loading products from Google Sheets...');
       return await this.loadProductsFromGoogleSheets();
     } catch (error) {
       console.error('Error loading products from Google Sheets:', error);
-      throw new Error('Failed to load products from Google Sheets. Please check your REACT_APP_GOOGLE_SHEETS_URL configuration.');
+      console.log('Falling back to local products...');
+      return this.getFallbackProducts();
     }
   }
 
@@ -60,7 +62,8 @@ export class CSVService {
   static async loadProductsFromGoogleSheets(): Promise<Product[]> {
     try {
       // Get Google Sheets URL from environment variable or use default
-      const googleSheetsUrl = process.env.REACT_APP_GOOGLE_SHEETS_URL;
+      const googleSheetsUrl = process.env.REACT_APP_GOOGLE_SHEETS_URL || 
+        'https://docs.google.com/spreadsheets/d/1E4OdeiFgBO07T6NSePoRUSo8n5B1pWX8Tt4k48bYw5w/edit?usp=sharing';
       
       if (!googleSheetsUrl) {
         throw new Error('Google Sheets URL not configured');
@@ -159,5 +162,58 @@ export class CSVService {
         }
       });
     });
+  }
+
+  static getFallbackProducts(): Product[] {
+    return [
+      {
+        id: 'shirt-1',
+        name: 'Classic White Shirt',
+        image: '/products/white-shirt.jpg',
+        category: 'Shirts',
+        price: '$29.99',
+        description: 'Classic white cotton shirt'
+      },
+      {
+        id: 'shirt-2',
+        name: 'Blue Denim Shirt',
+        image: '/products/blue-shirt.jpg',
+        category: 'Shirts',
+        price: '$34.99',
+        description: 'Comfortable blue denim shirt'
+      },
+      {
+        id: 'pants-1',
+        name: 'Black Pants',
+        image: '/products/black-pants.jpg',
+        category: 'Pants',
+        price: '$49.99',
+        description: 'Classic black dress pants'
+      },
+      {
+        id: 'jacket-1',
+        name: 'Leather Jacket',
+        image: '/products/leather-jacket.jpg',
+        category: 'Jackets',
+        price: '$129.99',
+        description: 'Genuine leather jacket'
+      },
+      {
+        id: 'dress-1',
+        name: 'Summer Dress',
+        image: '/products/summer-dress.jpg',
+        category: 'Dresses',
+        price: '$59.99',
+        description: 'Light and comfortable summer dress'
+      },
+      {
+        id: 'sweater-1',
+        name: 'Cozy Sweater',
+        image: '/products/sweater.jpg',
+        category: 'Sweaters',
+        price: '$39.99',
+        description: 'Warm and cozy sweater'
+      }
+    ];
   }
 }
