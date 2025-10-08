@@ -16,7 +16,8 @@ const allowedOrigins = [
   'http://localhost:3002',
   'https://mirrify-creativespaces.up.railway.app', // Your Railway frontend domain
   'https://mirrify-app-907099703781.us-central1.run.app', // Google Cloud Run frontend
-  'https://www.creativespaces.tech', // Creative Spaces production domain
+  'https://www.creativespaces.tech', // Creative Spaces production domain (with www)
+  'https://creativespaces.tech', // Creative Spaces production domain (without www)
   process.env.FRONTEND_URL, // Fallback for environment variable
 ];
 
@@ -103,6 +104,35 @@ app.get('/api/auth/token', async (req, res) => {
   } catch (error) {
     console.error('Error getting access token:', error);
     res.status(500).json({ error: 'Failed to get access token' });
+  }
+});
+
+// Proxy endpoint for images to handle CORS
+app.get('/api/proxy-image', async (req, res) => {
+  try {
+    const imageUrl = req.query.url;
+    if (!imageUrl) {
+      return res.status(400).json({ error: 'Image URL is required' });
+    }
+
+    const response = await axios.get(imageUrl, {
+      responseType: 'stream',
+      timeout: 10000,
+    });
+
+    // Set CORS headers
+    res.set({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Content-Type': response.headers['content-type'] || 'image/jpeg',
+      'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+    });
+
+    response.data.pipe(res);
+  } catch (error) {
+    console.error('Error proxying image:', error.message);
+    res.status(500).json({ error: 'Failed to load image' });
   }
 });
 
