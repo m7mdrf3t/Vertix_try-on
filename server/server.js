@@ -15,6 +15,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3002',
   'https://mirrify-creativespaces.up.railway.app', // Your Railway frontend domain
+  'https://mirrify-app-907099703781.us-central1.run.app', // Google Cloud Run frontend
   process.env.FRONTEND_URL, // Fallback for environment variable
 ];
 
@@ -38,27 +39,30 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '50mb' }));
 
-// Create credentials file from environment variable
-let credentialsPath;
+// Google Cloud authentication
+// On Cloud Run, use default service account; otherwise use explicit credentials
+let authConfig = {
+  scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+};
+
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  // For local development or when explicit credentials are provided
   try {
     const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-    console.log('Credentials parsed successfully, project_id:', credentials.project_id);
-    credentialsPath = path.join(__dirname, 'temp-credentials.json');
+    console.log('Using explicit credentials, project_id:', credentials.project_id);
+    const credentialsPath = path.join(__dirname, 'temp-credentials.json');
     fs.writeFileSync(credentialsPath, JSON.stringify(credentials, null, 2));
-    console.log('Credentials file created at:', credentialsPath);
+    authConfig.keyFile = credentialsPath;
   } catch (error) {
     console.error('Error parsing credentials:', error);
+    authConfig.keyFile = process.env.GOOGLE_APPLICATION_CREDENTIALS;
   }
 } else {
-  console.log('GOOGLE_APPLICATION_CREDENTIALS not set');
+  // On Cloud Run, use default service account
+  console.log('Using default service account (Cloud Run)');
 }
 
-// Google Cloud authentication
-const auth = new GoogleAuth({
-  keyFile: credentialsPath || process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-});
+const auth = new GoogleAuth(authConfig);
 
 // Get access token
 async function getAccessToken() {
@@ -107,7 +111,7 @@ app.post('/api/try-on', async (req, res) => {
     const accessToken = await getAccessToken();
     
     const response = await axios.post(
-      `https://us-central1-aiplatform.googleapis.com/v1/projects/${process.env.GOOGLE_PROJECT_ID}/locations/${process.env.GOOGLE_LOCATION}/publishers/google/models/${process.env.GOOGLE_MODEL_ID}:predict`,
+      `https://us-central1-aiplatform.googleapis.com/v1/projects/neat-cycling-470410-t9/locations/us-central1/publishers/google/models/virtual-try-on-preview-08-04:predict`, 
       req.body,
       {
         headers: {
