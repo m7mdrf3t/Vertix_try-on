@@ -4,6 +4,7 @@ const { GoogleAuth } = require('google-auth-library');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const tinify = require('tinify');
 require('dotenv').config();
 
 const app = express();
@@ -65,6 +66,14 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
 }
 
 const auth = new GoogleAuth(authConfig);
+
+// Configure TinyPNG
+if (process.env.TINYPNG_API_KEY) {
+  tinify.key = process.env.TINYPNG_API_KEY;
+  console.log('TinyPNG API configured');
+} else {
+  console.log('TinyPNG API key not found - using fallback compression');
+}
 
 // Get access token
 async function getAccessToken() {
@@ -133,6 +142,61 @@ app.get('/api/proxy-image', async (req, res) => {
   } catch (error) {
     console.error('Error proxying image:', error.message);
     res.status(500).json({ error: 'Failed to load image' });
+  }
+});
+
+// TinyPNG compression endpoint
+app.post('/api/compress-image', async (req, res) => {
+  try {
+    const { imageData, maxDimension = 1024 } = req.body;
+    
+    if (!imageData) {
+      return res.status(400).json({ error: 'Image data is required' });
+    }
+
+    // Convert base64 to buffer
+    const imageBuffer = Buffer.from(imageData.split(',')[1], 'base64');
+    
+    if (!process.env.TINYPNG_API_KEY) {
+      // Fallback to client-side compression if no API key
+      return res.status(400).json({ 
+        error: 'TinyPNG API key not configured',
+        fallback: true 
+      });
+    }
+
+    // Compress with TinyPNG
+    const source = tinify.fromBuffer(imageBuffer);
+    
+    // Resize if needed (maintain aspect ratio, largest dimension = maxDimension)
+    const resized = source.resize({
+      method: 'scale',
+      width: maxDimension,
+      height: maxDimension
+    });
+
+    const compressedBuffer = await resized.toBuffer();
+    
+    // Convert back to base64
+    const compressedBase64 = `data:image/jpeg;base64,${compressedBuffer.toString('base64')}`;
+    
+    res.json({
+      success: true,
+      compressedImage: compressedBase64,
+      originalSize: imageBuffer.length,
+      compressedSize: compressedBuffer.length,
+      compressionRatio: ((imageBuffer.length - compressedBuffer.length) / imageBuffer.length * 100).toFixed(1)
+    });
+
+  } catch (error) {
+    console.error('Error compressing image with TinyPNG:', error.message);
+    
+    // If TinyPNG fails, return fallback instruction
+    res.status(500).json({ 
+      error: 'TinyPNG compression failed',
+      fallback: true,
+      details: error.message 
+    });
   }
 });
 
