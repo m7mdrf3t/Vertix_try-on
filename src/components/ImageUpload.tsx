@@ -3,6 +3,7 @@ import { Upload, X, Loader2 } from 'lucide-react';
 import { UploadedImage } from '../types';
 import { compressImageWithTinyPNG, getImageDimensions, formatFileSize } from '../utils/tinypngCompression';
 import { compressImage } from '../utils/imageCompression';
+import { SharpImageService, SharpProcessingOptions } from '../services/sharpImageService';
 
 interface ImageUploadProps {
   onImageUpload: (image: UploadedImage) => void;
@@ -21,13 +22,14 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [compressingImages, setCompressingImages] = useState<Set<string>>(new Set());
+  const [quality, setQuality] = useState<number>(90);
 
   // Determine disabled state for the upload area (e.g., allow only one person image)
   const currentTypeImagesCount = uploadedImages.filter(img => img.type === type).length;
   const isDisabled = !!maxImages && currentTypeImagesCount >= maxImages;
   const alwaysShowRemove = type === 'person';
 
-  // Process image with TinyPNG compression (with fallback)
+  // Process image with Sharp backend (with TinyPNG fallback)
   const processImage = useCallback(async (file: File): Promise<void> => {
     const id = Math.random().toString(36).substr(2, 9);
     
@@ -35,32 +37,43 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       // Add to compressing set
       setCompressingImages(prev => new Set(prev).add(id));
       
-      // Get original dimensions
-      const originalDimensions = await getImageDimensions(file);
-      console.log(`Original image: ${originalDimensions.width}x${originalDimensions.height}, ${formatFileSize(file.size)}`);
+      // Get original metadata
+      const originalMetadata = await SharpImageService.getImageMetadata(file);
+      console.log(`Original image: ${originalMetadata.width}x${originalMetadata.height}, ${SharpImageService.formatFileSize(file.size)}, DPI: ${originalMetadata.density}`);
       
-      let compressedFile: File;
+      let processedFile: File;
       
       try {
-        // Try TinyPNG compression first
-        console.log('Attempting TinyPNG compression...');
-        compressedFile = await compressImageWithTinyPNG(file, 1024);
-        console.log('✅ TinyPNG compression successful');
-      } catch (tinyPNGError: unknown) {
-        // Fallback to client-side compression
-        console.log('⚠️ TinyPNG failed, using fallback compression:', tinyPNGError instanceof Error ? tinyPNGError.message : 'Unknown error');
-        compressedFile = await compressImage(file, 1024, 1.0);
-        console.log('✅ Fallback compression successful');
+        // Try Sharp processing first
+        console.log('Attempting Sharp processing...');
+        const sharpOptions: SharpProcessingOptions = {
+          maxDimension: 1024,
+          quality: quality,
+          format: 'jpeg',
+          preserveMetadata: true
+        };
+        
+        const result = await SharpImageService.processImage(file, sharpOptions);
+        processedFile = result.file;
+        console.log(`Sharp processed image: ${result.metadata.width}x${result.metadata.height}, ${SharpImageService.formatFileSize(processedFile.size)}, DPI: ${result.metadata.density}`);
+      } catch (sharpError: unknown) {
+        // Fallback to TinyPNG compression
+        console.log('⚠️ Sharp failed, trying TinyPNG compression:', sharpError instanceof Error ? sharpError.message : 'Unknown error');
+        try {
+          processedFile = await compressImageWithTinyPNG(file, 1024);
+          console.log('✅ TinyPNG compression successful');
+        } catch (tinyPNGError: unknown) {
+          // Final fallback to client-side compression
+          console.log('⚠️ TinyPNG failed, using fallback compression:', tinyPNGError instanceof Error ? tinyPNGError.message : 'Unknown error');
+          processedFile = await compressImage(file, 1024, 1.0);
+          console.log('✅ Fallback compression successful');
+        }
       }
-      
-      // Get resized dimensions
-      const resizedDimensions = await getImageDimensions(compressedFile);
-      console.log(`Final image: ${resizedDimensions.width}x${resizedDimensions.height}, ${formatFileSize(compressedFile.size)}`);
       
       const image: UploadedImage = {
         id,
-        file: compressedFile,
-        preview: URL.createObjectURL(compressedFile),
+        file: processedFile,
+        preview: URL.createObjectURL(processedFile),
         type,
         name: file.name,
       };
@@ -68,7 +81,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       onImageUpload(image);
     } catch (error) {
       console.error('Error processing image:', error);
-      // Fallback to original file if all compression fails
+      // Fallback to original file if all processing fails
       const image: UploadedImage = {
         id,
         file,
@@ -85,7 +98,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         return newSet;
       });
     }
-  }, [onImageUpload, type]);
+  }, [onImageUpload, type, quality]);
 
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -151,6 +164,25 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
               </span>
             )}
           </p>
+          
+          {/* Quality Control */}
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Image Quality: {quality}%
+            </label>
+            <input
+              type="range"
+              min="10"
+              max="100"
+              value={quality}
+              onChange={(e) => setQuality(parseInt(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>Lower size</span>
+              <span>Higher quality</span>
+            </div>
+          </div>
         </div>
         <input
           ref={fileInputRef}

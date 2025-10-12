@@ -5,6 +5,8 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const tinify = require('tinify');
+const multer = require('multer');
+const { processImageWithSharp, getImageMetadata } = require('./imageProcessor');
 require('dotenv').config();
 
 const app = express();
@@ -41,6 +43,14 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json({ limit: '50mb' }));
+
+// Configure multer for file uploads
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 50 * 1024 * 1024 // 50MB limit
+  }
+});
 
 // Google Cloud authentication
 // On Cloud Run, use default service account; otherwise use explicit credentials
@@ -113,6 +123,68 @@ app.get('/api/auth/token', async (req, res) => {
   } catch (error) {
     console.error('Error getting access token:', error);
     res.status(500).json({ error: 'Failed to get access token' });
+  }
+});
+
+// Image processing endpoint with Sharp
+app.post('/api/process-image', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const { maxDimension = 1024, quality = 90, format = 'jpeg', preserveMetadata = true } = req.body;
+    
+    console.log('Processing image with Sharp:', {
+      originalSize: req.file.size,
+      maxDimension,
+      quality,
+      format,
+      preserveMetadata
+    });
+
+    // Process image with Sharp
+    const processedBuffer = await processImageWithSharp(req.file.buffer, {
+      maxDimension: parseInt(maxDimension),
+      quality: parseInt(quality),
+      format,
+      preserveMetadata: preserveMetadata === 'true'
+    });
+
+    // Get processed metadata
+    const metadata = await getImageMetadata(processedBuffer);
+
+    // Set response headers
+    res.set({
+      'Content-Type': `image/${format}`,
+      'Content-Length': processedBuffer.length,
+      'X-Original-Size': req.file.size,
+      'X-Processed-Size': processedBuffer.length,
+      'X-Dimensions': `${metadata.width}x${metadata.height}`,
+      'X-DPI': metadata.density
+    });
+
+    res.send(processedBuffer);
+
+  } catch (error) {
+    console.error('Error processing image:', error);
+    res.status(500).json({ error: 'Failed to process image' });
+  }
+});
+
+// Get image metadata endpoint
+app.post('/api/image-metadata', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const metadata = await getImageMetadata(req.file.buffer);
+    res.json(metadata);
+
+  } catch (error) {
+    console.error('Error getting image metadata:', error);
+    res.status(500).json({ error: 'Failed to get image metadata' });
   }
 });
 
