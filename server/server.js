@@ -25,6 +25,7 @@ const allowedOrigins = [
   'http://localhost:3002',
   'https://mirrify-creativespaces.up.railway.app', // Your Railway frontend domain
   'https://mirrify-app-907099703781.us-central1.run.app', // Google Cloud Run frontend
+  'https://mirrify-frontend-907099703781.us-central1.run.app', // Current Google Cloud Run frontend
   'https://www.creativespaces.tech', // Creative Spaces production domain (with www)
   'https://creativespaces.tech', // Creative Spaces production domain (without www)
   process.env.FRONTEND_URL, // Fallback for environment variable

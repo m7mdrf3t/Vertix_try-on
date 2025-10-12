@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { PredictionRequest, PredictionResponse } from '../types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-server-907099703781.us-central1.run.app';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-backend-907099703781.us-central1.run.app';
 
 // Debug: Log the API URL being used
 console.log('API_BASE_URL:', API_BASE_URL);

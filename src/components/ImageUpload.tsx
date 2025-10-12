@@ -28,7 +28,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const isDisabled = !!maxImages && currentTypeImagesCount >= maxImages;
   const alwaysShowRemove = type === 'person';
 
-  // Process image with Sharp backend (with TinyPNG fallback)
+  // Process image with optimized compression strategy
   const processImage = useCallback(async (file: File): Promise<void> => {
     const id = Math.random().toString(36).substr(2, 9);
     
@@ -36,35 +36,33 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       // Add to compressing set
       setCompressingImages(prev => new Set(prev).add(id));
       
-      // Get original metadata
-      const originalMetadata = await SharpImageService.getImageMetadata(file);
-      console.log(`Original image: ${originalMetadata.width}x${originalMetadata.height}, ${SharpImageService.formatFileSize(file.size)}, DPI: ${originalMetadata.density}`);
+      console.log(`Processing image: ${file.name}, ${SharpImageService.formatFileSize(file.size)}`);
       
       let processedFile: File;
       
-      try {
-        // Try Sharp processing first
-        console.log('Attempting Sharp processing...');
-        const sharpOptions: SharpProcessingOptions = {
-          maxDimension: 1024,
-          format: 'jpeg',
-          preserveMetadata: true
-        };
-        
-        const result = await SharpImageService.processImage(file, sharpOptions);
-        processedFile = result.file;
-        console.log(`Sharp processed image: ${result.metadata.width}x${result.metadata.height}, ${SharpImageService.formatFileSize(processedFile.size)}, DPI: ${result.metadata.density}`);
-      } catch (sharpError: unknown) {
-        // Fallback to TinyPNG compression
-        console.log('⚠️ Sharp failed, trying TinyPNG compression:', sharpError instanceof Error ? sharpError.message : 'Unknown error');
+      // For large images (>5MB), pre-compress on client side first
+      if (file.size > 5 * 1024 * 1024) {
+        console.log('Large image detected, pre-compressing on client side...');
+        processedFile = await compressImage(file, 1024, 0.8); // 80% quality for pre-compression
+        console.log(`Pre-compressed to: ${SharpImageService.formatFileSize(processedFile.size)}`);
+      } else {
+        // For smaller images, try Sharp processing directly
         try {
-          processedFile = await compressImageWithTinyPNG(file, 1024);
-          console.log('✅ TinyPNG compression successful');
-        } catch (tinyPNGError: unknown) {
-          // Final fallback to client-side compression
-          console.log('⚠️ TinyPNG failed, using fallback compression:', tinyPNGError instanceof Error ? tinyPNGError.message : 'Unknown error');
-          processedFile = await compressImage(file, 1024, 1.0);
-          console.log('✅ Fallback compression successful');
+          console.log('Attempting Sharp processing...');
+          const sharpOptions: SharpProcessingOptions = {
+            maxDimension: 1024,
+            format: 'jpeg',
+            preserveMetadata: true
+          };
+          
+          const result = await SharpImageService.processImage(file, sharpOptions);
+          processedFile = result.file;
+          console.log(`Sharp processed image: ${result.metadata.width}x${result.metadata.height}, ${SharpImageService.formatFileSize(processedFile.size)}, DPI: ${result.metadata.density}`);
+        } catch (sharpError: unknown) {
+          // Fallback to client-side compression
+          console.log('⚠️ Sharp failed, using client-side compression:', sharpError instanceof Error ? sharpError.message : 'Unknown error');
+          processedFile = await compressImage(file, 1024, 0.9);
+          console.log('✅ Client-side compression successful');
         }
       }
       

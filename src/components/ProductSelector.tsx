@@ -7,7 +7,7 @@ const getImageSrc = (imagePath: string): string => {
   // Check if it's a URL (starts with http:// or https://)
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
     // Use proxy for external URLs to handle CORS
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-server-907099703781.us-central1.run.app';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-backend-907099703781.us-central1.run.app';
     return `${API_BASE_URL}/api/proxy-image?url=${encodeURIComponent(imagePath)}`;
   }
   // Check if it's a data URL (starts with data:)

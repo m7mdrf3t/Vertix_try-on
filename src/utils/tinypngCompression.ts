@@ -14,7 +14,7 @@ export const compressImageWithTinyPNG = async (
       const base64 = await fileToBase64(file);
       
       // Get API base URL
-      const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-server-907099703781.us-central1.run.app';
+      const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-backend-907099703781.us-central1.run.app';
       
       // Call TinyPNG compression endpoint
       const response = await fetch(`${API_BASE_URL}/api/compress-image`, {
