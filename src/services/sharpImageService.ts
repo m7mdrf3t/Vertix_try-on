@@ -5,7 +5,6 @@
 
 export interface SharpProcessingOptions {
   maxDimension?: number;
-  quality?: number;
   format?: 'jpeg' | 'png' | 'webp';
   preserveMetadata?: boolean;
 }
@@ -35,7 +34,6 @@ export class SharpImageService {
   ): Promise<{ file: File; metadata: ImageMetadata }> {
     const {
       maxDimension = 1024,
-      quality = 90,
       format = 'jpeg',
       preserveMetadata = true
     } = options;
@@ -45,14 +43,14 @@ export class SharpImageService {
       const formData = new FormData();
       formData.append('image', file);
       formData.append('maxDimension', maxDimension.toString());
-      formData.append('quality', quality.toString());
+      formData.append('quality', '90');
       formData.append('format', format);
       formData.append('preserveMetadata', preserveMetadata.toString());
 
       console.log('Processing image with Sharp backend:', {
         originalSize: file.size,
         maxDimension,
-        quality,
+        quality: 90,
         format,
         preserveMetadata
       });

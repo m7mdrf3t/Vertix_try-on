@@ -22,7 +22,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [compressingImages, setCompressingImages] = useState<Set<string>>(new Set());
-  const [quality, setQuality] = useState<number>(90);
 
   // Determine disabled state for the upload area (e.g., allow only one person image)
   const currentTypeImagesCount = uploadedImages.filter(img => img.type === type).length;
@@ -48,7 +47,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         console.log('Attempting Sharp processing...');
         const sharpOptions: SharpProcessingOptions = {
           maxDimension: 1024,
-          quality: quality,
           format: 'jpeg',
           preserveMetadata: true
         };
@@ -98,7 +96,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         return newSet;
       });
     }
-  }, [onImageUpload, type, quality]);
+  }, [onImageUpload, type]);
 
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -164,25 +162,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
               </span>
             )}
           </p>
-          
-          {/* Quality Control */}
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Image Quality: {quality}%
-            </label>
-            <input
-              type="range"
-              min="10"
-              max="100"
-              value={quality}
-              onChange={(e) => setQuality(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>Lower size</span>
-              <span>Higher quality</span>
-            </div>
-          </div>
         </div>
         <input
           ref={fileInputRef}

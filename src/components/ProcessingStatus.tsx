@@ -31,10 +31,10 @@ export const ProcessingStatus: React.FC<ProcessingStatusProps> = ({
             <Loader2 className="w-6 h-6 text-primary-500 animate-spin" />
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-700">
-                Processing virtual try-on...
+                Magic in Progress...
               </p>
               <p className="text-xs text-gray-500">
-                This may take a few minutes
+                30 seconds to fabulous!
               </p>
             </div>
           </div>
