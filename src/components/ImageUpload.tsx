@@ -38,7 +38,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       const originalDimensions = await getImageDimensions(file);
       console.log(`Original image: ${originalDimensions.width}x${originalDimensions.height}, ${formatFileSize(file.size)}`);
       
-      // Resize image to max 1024px width with maximum quality
+      // Resize image to max 1024px largest dimension with maximum quality
       const compressedFile = await compressImage(file, 1024, 1.0);
       
       // Get resized dimensions

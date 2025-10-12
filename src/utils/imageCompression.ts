@@ -1,13 +1,13 @@
 /**
- * Resizes an image file to a maximum width of 1024px while maintaining aspect ratio and original resolution quality
+ * Resizes an image file to a maximum dimension of 1024px while maintaining aspect ratio and original resolution quality
  * @param file - The original image file
- * @param maxWidth - Maximum width (default: 1024)
+ * @param maxDimension - Maximum dimension (width or height) (default: 1024)
  * @param quality - Compression quality 0-1 (default: 1.0 for maximum quality)
  * @returns Promise<File> - The resized image file
  */
 export const compressImage = (
   file: File, 
-  maxWidth: number = 1024, 
+  maxDimension: number = 1024, 
   quality: number = 1.0
 ): Promise<File> => {
   return new Promise((resolve, reject) => {
@@ -19,29 +19,39 @@ export const compressImage = (
       // Calculate new dimensions maintaining aspect ratio
       let { width, height } = img;
       
-      if (width > maxWidth) {
-        height = (height * maxWidth) / width;
-        width = maxWidth;
+      // Determine which dimension is larger and scale accordingly
+      if (width > height) {
+        // Width is larger, scale to maxDimension
+        if (width > maxDimension) {
+          height = (height * maxDimension) / width;
+          width = maxDimension;
+        }
+      } else {
+        // Height is larger, scale to maxDimension
+        if (height > maxDimension) {
+          width = (width * maxDimension) / height;
+          height = maxDimension;
+        }
       }
 
       // Set canvas dimensions
       canvas.width = width;
       canvas.height = height;
 
-      // Draw and compress
+      // Draw and resize
       ctx?.drawImage(img, 0, 0, width, height);
       
       canvas.toBlob(
         (blob) => {
           if (blob) {
-            // Create new file with compressed data
-            const compressedFile = new File([blob], file.name, {
+            // Create new file with resized data
+            const resizedFile = new File([blob], file.name, {
               type: file.type,
               lastModified: Date.now(),
             });
-            resolve(compressedFile);
+            resolve(resizedFile);
           } else {
-            reject(new Error('Failed to compress image'));
+            reject(new Error('Failed to resize image'));
           }
         },
         file.type,
