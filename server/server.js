@@ -165,17 +165,38 @@ app.post('/api/compress-image', async (req, res) => {
       });
     }
 
-    // Compress with TinyPNG
+    // Compress with TinyPNG (maintain original DPI/resolution)
     const source = tinify.fromBuffer(imageBuffer);
     
-    // Resize if needed (maintain aspect ratio, largest dimension = maxDimension)
-    const resized = source.resize({
-      method: 'scale',
-      width: maxDimension,
-      height: maxDimension
-    });
+    // Get original dimensions first
+    const originalMetadata = await source.metadata();
+    const originalWidth = originalMetadata.width;
+    const originalHeight = originalMetadata.height;
+    
+    let processedSource = source;
+    let finalWidth = originalWidth;
+    let finalHeight = originalHeight;
+    
+    // Only resize if the largest dimension exceeds maxDimension
+    const largestDimension = Math.max(originalWidth, originalHeight);
+    if (largestDimension > maxDimension) {
+      // Calculate new dimensions maintaining aspect ratio
+      if (originalWidth > originalHeight) {
+        finalWidth = maxDimension;
+        finalHeight = Math.round((originalHeight * maxDimension) / originalWidth);
+      } else {
+        finalHeight = maxDimension;
+        finalWidth = Math.round((originalWidth * maxDimension) / originalHeight);
+      }
+      
+      processedSource = source.resize({
+        method: 'scale',
+        width: finalWidth,
+        height: finalHeight
+      });
+    }
 
-    const compressedBuffer = await resized.toBuffer();
+    const compressedBuffer = await processedSource.toBuffer();
     
     // Convert back to base64
     const compressedBase64 = `data:image/jpeg;base64,${compressedBuffer.toString('base64')}`;
@@ -185,7 +206,10 @@ app.post('/api/compress-image', async (req, res) => {
       compressedImage: compressedBase64,
       originalSize: imageBuffer.length,
       compressedSize: compressedBuffer.length,
-      compressionRatio: ((imageBuffer.length - compressedBuffer.length) / imageBuffer.length * 100).toFixed(1)
+      compressionRatio: ((imageBuffer.length - compressedBuffer.length) / imageBuffer.length * 100).toFixed(1),
+      originalDimensions: { width: originalWidth, height: originalHeight },
+      processedDimensions: { width: finalWidth, height: finalHeight },
+      wasResized: largestDimension > maxDimension
     });
 
   } catch (error) {

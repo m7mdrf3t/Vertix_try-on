@@ -1,7 +1,8 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { UploadedImage } from '../types';
-import { compressImage, getImageDimensions, formatFileSize } from '../utils/imageCompression';
+import { compressImageWithTinyPNG, getImageDimensions, formatFileSize } from '../utils/tinypngCompression';
+import { compressImage } from '../utils/imageCompression';
 
 interface ImageUploadProps {
   onImageUpload: (image: UploadedImage) => void;
@@ -26,7 +27,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const isDisabled = !!maxImages && currentTypeImagesCount >= maxImages;
   const alwaysShowRemove = type === 'person';
 
-  // Process image with compression
+  // Process image with TinyPNG compression (with fallback)
   const processImage = useCallback(async (file: File): Promise<void> => {
     const id = Math.random().toString(36).substr(2, 9);
     
@@ -38,12 +39,23 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       const originalDimensions = await getImageDimensions(file);
       console.log(`Original image: ${originalDimensions.width}x${originalDimensions.height}, ${formatFileSize(file.size)}`);
       
-      // Resize image to max 1024px largest dimension with maximum quality
-      const compressedFile = await compressImage(file, 1024, 1.0);
+      let compressedFile: File;
+      
+      try {
+        // Try TinyPNG compression first
+        console.log('Attempting TinyPNG compression...');
+        compressedFile = await compressImageWithTinyPNG(file, 1024);
+        console.log('✅ TinyPNG compression successful');
+      } catch (tinyPNGError: unknown) {
+        // Fallback to client-side compression
+        console.log('⚠️ TinyPNG failed, using fallback compression:', tinyPNGError instanceof Error ? tinyPNGError.message : 'Unknown error');
+        compressedFile = await compressImage(file, 1024, 1.0);
+        console.log('✅ Fallback compression successful');
+      }
       
       // Get resized dimensions
       const resizedDimensions = await getImageDimensions(compressedFile);
-      console.log(`Resized image: ${resizedDimensions.width}x${resizedDimensions.height}, ${formatFileSize(compressedFile.size)}`);
+      console.log(`Final image: ${resizedDimensions.width}x${resizedDimensions.height}, ${formatFileSize(compressedFile.size)}`);
       
       const image: UploadedImage = {
         id,
@@ -56,7 +68,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       onImageUpload(image);
     } catch (error) {
       console.error('Error processing image:', error);
-      // Fallback to original file if compression fails
+      // Fallback to original file if all compression fails
       const image: UploadedImage = {
         id,
         file,
