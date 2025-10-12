@@ -20,7 +20,7 @@ export interface ImageMetadata {
 }
 
 export class SharpImageService {
-  private static API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+  private static API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-server-907099703781.us-central1.run.app';
 
   /**
    * Process image using Sharp backend
