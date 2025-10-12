@@ -38,12 +38,12 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       const originalDimensions = await getImageDimensions(file);
       console.log(`Original image: ${originalDimensions.width}x${originalDimensions.height}, ${formatFileSize(file.size)}`);
       
-      // Compress image to max 1024px width
-      const compressedFile = await compressImage(file, 1024, 0.9);
+      // Resize image to max 1024px width with maximum quality
+      const compressedFile = await compressImage(file, 1024, 1.0);
       
-      // Get compressed dimensions
-      const compressedDimensions = await getImageDimensions(compressedFile);
-      console.log(`Compressed image: ${compressedDimensions.width}x${compressedDimensions.height}, ${formatFileSize(compressedFile.size)}`);
+      // Get resized dimensions
+      const resizedDimensions = await getImageDimensions(compressedFile);
+      console.log(`Resized image: ${resizedDimensions.width}x${resizedDimensions.height}, ${formatFileSize(compressedFile.size)}`);
       
       const image: UploadedImage = {
         id,
@@ -165,7 +165,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
                   <div className="text-center">
                     <Loader2 className="mx-auto h-8 w-8 text-gray-400 animate-spin" />
-                    <p className="text-xs text-gray-500 mt-2">Compressing...</p>
+                    <p className="text-xs text-gray-500 mt-2">Processing...</p>
                   </div>
                 </div>
               </div>

@@ -1,14 +1,14 @@
 /**
- * Compresses an image file to a maximum width of 1024px while maintaining aspect ratio
+ * Resizes an image file to a maximum width of 1024px while maintaining aspect ratio and original resolution quality
  * @param file - The original image file
  * @param maxWidth - Maximum width (default: 1024)
- * @param quality - Compression quality 0-1 (default: 0.9)
- * @returns Promise<File> - The compressed image file
+ * @param quality - Compression quality 0-1 (default: 1.0 for maximum quality)
+ * @returns Promise<File> - The resized image file
  */
 export const compressImage = (
   file: File, 
   maxWidth: number = 1024, 
-  quality: number = 0.9
+  quality: number = 1.0
 ): Promise<File> => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
