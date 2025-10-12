@@ -1,6 +1,7 @@
-import React, { useCallback, useRef } from 'react';
-import { Upload, X } from 'lucide-react';
+import React, { useCallback, useRef, useState } from 'react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { UploadedImage } from '../types';
+import { compressImage, getImageDimensions, formatFileSize } from '../utils/imageCompression';
 
 interface ImageUploadProps {
   onImageUpload: (image: UploadedImage) => void;
@@ -18,11 +19,61 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   maxImages,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [compressingImages, setCompressingImages] = useState<Set<string>>(new Set());
 
   // Determine disabled state for the upload area (e.g., allow only one person image)
   const currentTypeImagesCount = uploadedImages.filter(img => img.type === type).length;
   const isDisabled = !!maxImages && currentTypeImagesCount >= maxImages;
   const alwaysShowRemove = type === 'person';
+
+  // Process image with compression
+  const processImage = useCallback(async (file: File): Promise<void> => {
+    const id = Math.random().toString(36).substr(2, 9);
+    
+    try {
+      // Add to compressing set
+      setCompressingImages(prev => new Set(prev).add(id));
+      
+      // Get original dimensions
+      const originalDimensions = await getImageDimensions(file);
+      console.log(`Original image: ${originalDimensions.width}x${originalDimensions.height}, ${formatFileSize(file.size)}`);
+      
+      // Compress image to max 1024px width
+      const compressedFile = await compressImage(file, 1024, 0.9);
+      
+      // Get compressed dimensions
+      const compressedDimensions = await getImageDimensions(compressedFile);
+      console.log(`Compressed image: ${compressedDimensions.width}x${compressedDimensions.height}, ${formatFileSize(compressedFile.size)}`);
+      
+      const image: UploadedImage = {
+        id,
+        file: compressedFile,
+        preview: URL.createObjectURL(compressedFile),
+        type,
+        name: file.name,
+      };
+      
+      onImageUpload(image);
+    } catch (error) {
+      console.error('Error processing image:', error);
+      // Fallback to original file if compression fails
+      const image: UploadedImage = {
+        id,
+        file,
+        preview: URL.createObjectURL(file),
+        type,
+        name: file.name,
+      };
+      onImageUpload(image);
+    } finally {
+      // Remove from compressing set
+      setCompressingImages(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
+  }, [onImageUpload, type]);
 
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -33,15 +84,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
     Array.from(files).slice(0, remainingSlots).forEach(file => {
       if (file.type.startsWith('image/')) {
-        const id = Math.random().toString(36).substr(2, 9);
-        const image: UploadedImage = {
-          id,
-          file,
-          preview: URL.createObjectURL(file),
-          type,
-          name: file.name,
-        };
-        onImageUpload(image);
+        processImage(file);
       }
     });
 
@@ -49,7 +92,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, [onImageUpload, type, maxImages, uploadedImages]);
+  }, [processImage, type, maxImages, uploadedImages]);
 
   const handleDragOver = useCallback((event: React.DragEvent) => {
     // Prevent default to allow drop, but do nothing further if disabled
@@ -65,18 +108,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     
     Array.from(files).slice(0, remainingSlots).forEach(file => {
       if (file.type.startsWith('image/')) {
-        const id = Math.random().toString(36).substr(2, 9);
-        const image: UploadedImage = {
-          id,
-          file,
-          preview: URL.createObjectURL(file),
-          type,
-          name: file.name,
-        };
-        onImageUpload(image);
+        processImage(file);
       }
     });
-  }, [onImageUpload, type, maxImages, uploadedImages]);
+  }, [processImage, type, maxImages, uploadedImages]);
 
 
   return (
@@ -118,10 +153,25 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       )}
 
       {/* Uploaded Images */}
-      {uploadedImages.filter(img => img.type === type).length > 0 && (
+      {(uploadedImages.filter(img => img.type === type).length > 0 || compressingImages.size > 0) && (
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-gray-700">Image Uploaded</h4>
+          <h4 className="text-sm font-medium text-gray-700">
+            {compressingImages.size > 0 ? 'Processing Images...' : 'Images Uploaded'}
+          </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Show compressing placeholders */}
+            {Array.from(compressingImages).map((id) => (
+              <div key={`compressing-${id}`} className="relative group">
+                <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                  <div className="text-center">
+                    <Loader2 className="mx-auto h-8 w-8 text-gray-400 animate-spin" />
+                    <p className="text-xs text-gray-500 mt-2">Compressing...</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {/* Show uploaded images */}
             {uploadedImages.filter(img => img.type === type).map((image) => (
               <div key={image.id} className="relative group">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
@@ -132,7 +182,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                   />
                 </div>
                 
-
                 {/* Remove Button */}
                 <button
                   onClick={() => onImageRemove(image.id)}
@@ -140,7 +189,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 >
                   <X className="h-4 w-4" />
                 </button>
-
               </div>
             ))}
           </div>
