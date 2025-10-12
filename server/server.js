@@ -12,6 +12,12 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Google Cloud Run compatibility
+if (process.env.NODE_ENV === 'production') {
+  console.log('Running in production mode on Google Cloud Run');
+  console.log('Port:', PORT);
+}
+
 // Middleware
 // CORS configuration for development and production
 const allowedOrigins = [
@@ -140,7 +146,8 @@ app.post('/api/process-image', upload.single('image'), async (req, res) => {
       maxDimension,
       quality,
       format,
-      preserveMetadata
+      preserveMetadata,
+      environment: process.env.NODE_ENV || 'development'
     });
 
     // Process image with Sharp
@@ -153,6 +160,13 @@ app.post('/api/process-image', upload.single('image'), async (req, res) => {
 
     // Get processed metadata
     const metadata = await getImageMetadata(processedBuffer);
+
+    console.log('Sharp processing successful:', {
+      originalSize: req.file.size,
+      processedSize: processedBuffer.length,
+      compressionRatio: ((req.file.size - processedBuffer.length) / req.file.size * 100).toFixed(1) + '%',
+      dimensions: `${metadata.width}x${metadata.height}`
+    });
 
     // Set response headers
     res.set({
@@ -167,8 +181,16 @@ app.post('/api/process-image', upload.single('image'), async (req, res) => {
     res.send(processedBuffer);
 
   } catch (error) {
-    console.error('Error processing image:', error);
-    res.status(500).json({ error: 'Failed to process image' });
+    console.error('Error processing image with Sharp:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      environment: process.env.NODE_ENV || 'development'
+    });
+    res.status(500).json({ 
+      error: 'Failed to process image',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
   }
 });
 
