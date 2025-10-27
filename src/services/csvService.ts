@@ -24,6 +24,60 @@ export class CSVService {
     }
   }
 
+  // New method to load products from a specific Google Sheet URL
+  static async loadProductsFromSheetUrl(sheetUrl: string): Promise<Product[]> {
+    try {
+      if (!sheetUrl) {
+        throw new Error('Google Sheets URL not provided');
+      }
+
+      // Convert Google Sheets URL to CSV export URL
+      let csvUrl = sheetUrl;
+      if (csvUrl.includes('/edit#gid=')) {
+        csvUrl = csvUrl.replace('/edit#gid=', '/export?format=csv&gid=');
+      } else if (csvUrl.includes('/edit?usp=sharing')) {
+        csvUrl = csvUrl.replace('/edit?usp=sharing', '/export?format=csv&gid=0');
+      } else if (csvUrl.includes('/edit')) {
+        csvUrl = csvUrl.replace('/edit', '/export?format=csv&gid=0');
+      }
+      
+      const response = await fetch(csvUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch Google Sheets: ${response.status}`);
+      }
+      
+      const csvText = await response.text();
+      
+      return new Promise((resolve, reject) => {
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            try {
+              const products: Product[] = results.data.map((row: any) => ({
+                id: row.id || row.ID || '',
+                name: row.name || row.Name || row.NAME || '',
+                image: row.image || row.Image || row.IMAGE || '',
+                category: row.category || row.Category || row.CATEGORY || '',
+                price: row.price || row.Price || row.PRICE || '',
+                description: row.description || row.Description || row.DESCRIPTION || '',
+              }));
+              resolve(products);
+            } catch (error) {
+              reject(error);
+            }
+          },
+          error: (error: any) => {
+            reject(error);
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error loading products from specific sheet URL:', error);
+      throw error;
+    }
+  }
+
   static async loadProductsFromCSV(): Promise<Product[]> {
     try {
       const response = await fetch('/assets/products.csv');

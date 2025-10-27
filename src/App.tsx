@@ -1,14 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import { ImageUpload } from './components/ImageUpload';
 import { ProductSelector } from './components/ProductSelector';
+import { DualProductSelector } from './components/DualProductSelector';
 import { ProcessingStatus } from './components/ProcessingStatus';
 import { AdvancedOptions } from './components/AdvancedOptions';
 import { VirtualTryOnAPI } from './services/api';
+import { combineGarments, getBase64Data } from './utils/imageComposer';
 import { UploadedImage, Product, ProcessingState, TryOnParameters } from './types';
 
 function App() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [selectedUpperProduct, setSelectedUpperProduct] = useState<Product | null>(null);
+  const [selectedLowerProduct, setSelectedLowerProduct] = useState<Product | null>(null);
   const [processingState, setProcessingState] = useState<ProcessingState>({
     isProcessing: false,
     progress: 0,
@@ -17,6 +21,7 @@ function App() {
   const [resultImage, setResultImage] = useState<string | undefined>();
   const [parameters, setParameters] = useState<TryOnParameters>({});
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [useDualGarments, setUseDualGarments] = useState(true); // Toggle between old and new mode
   const ctrlPressCountRef = React.useRef(0);
 
   const handleImageUpload = useCallback((image: UploadedImage) => {
@@ -84,13 +89,26 @@ function App() {
       return;
     }
 
-    if (selectedProducts.length === 0) {
-      setProcessingState({
-        isProcessing: false,
-        progress: 0,
-        error: 'Please select at least one product',
-      });
-      return;
+    if (useDualGarments) {
+      // New dual garment mode
+      if (!selectedUpperProduct || !selectedLowerProduct) {
+        setProcessingState({
+          isProcessing: false,
+          progress: 0,
+          error: 'Please select both upper and lower garments',
+        });
+        return;
+      }
+    } else {
+      // Old single product mode
+      if (selectedProducts.length === 0) {
+        setProcessingState({
+          isProcessing: false,
+          progress: 0,
+          error: 'Please select at least one product',
+        });
+        return;
+      }
     }
 
     setProcessingState({
@@ -109,11 +127,29 @@ function App() {
         }));
       }, 1000);
 
-      // Convert images to base64
+      // Convert person image to base64
       const personImageBase64 = await VirtualTryOnAPI.convertImageToBase64(personImages[0].file);
-      const productImagesBase64 = await Promise.all(
-        selectedProducts.map(product => convertImageUrlToBase64(product.image))
-      );
+
+      let productImagesBase64: string[];
+
+      if (useDualGarments && selectedUpperProduct && selectedLowerProduct) {
+        // NEW MODE: Combine upper and lower garments into one composite image
+        console.log('Combining upper and lower garments...');
+        
+        const compositeResult = await combineGarments(
+          selectedUpperProduct.image,
+          selectedLowerProduct.image
+        );
+
+        // Extract base64 data from the result
+        const compositeBase64 = getBase64Data(compositeResult.base64);
+        productImagesBase64 = [compositeBase64];
+      } else {
+        // OLD MODE: Use selected products as-is
+        productImagesBase64 = await Promise.all(
+          selectedProducts.map(product => convertImageUrlToBase64(product.image))
+        );
+      }
 
       // Prepare request
       const request = {
@@ -158,7 +194,7 @@ function App() {
         error: error instanceof Error ? error.message : 'An unknown error occurred',
       });
     }
-  }, [uploadedImages, selectedProducts, parameters]);
+  }, [uploadedImages, selectedProducts, selectedUpperProduct, selectedLowerProduct, useDualGarments, parameters]);
 
   const handleDownload = useCallback(() => {
     if (!resultImage) return;
@@ -172,7 +208,7 @@ function App() {
   }, [resultImage]);
 
   const canProcess = uploadedImages.filter(img => img.type === 'person').length > 0 &&
-                    selectedProducts.length > 0;
+                    (useDualGarments ? (selectedUpperProduct !== null && selectedLowerProduct !== null) : selectedProducts.length > 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -203,18 +239,30 @@ function App() {
 
 
 
-          {/* Image Upload and Product Selection Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Image Upload Section */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Your Image</h3>
+            <ImageUpload
+              onImageUpload={handleImageUpload}
+              onImageRemove={handleImageRemove}
+              uploadedImages={uploadedImages}
+              type="person"
+              maxImages={1}
+            />
+          </div>
+
+          {/* Product Selection Section */}
+          {useDualGarments ? (
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Your Image Uploader</h3>
-              <ImageUpload
-                onImageUpload={handleImageUpload}
-                onImageRemove={handleImageRemove}
-                uploadedImages={uploadedImages}
-                type="person"
-                maxImages={1}
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Select Garments</h3>
+              <DualProductSelector
+                onUpperProductSelect={setSelectedUpperProduct}
+                onLowerProductSelect={setSelectedLowerProduct}
+                selectedUpperProduct={selectedUpperProduct}
+                selectedLowerProduct={selectedLowerProduct}
               />
             </div>
+          ) : (
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-4">Select Product</h3>
               <ProductSelector
@@ -224,7 +272,7 @@ function App() {
                 maxProducts={1}
               />
             </div>
-          </div>
+          )}
 
           {/* Advanced Options - Hidden by default, shown after 3 Ctrl presses */}
           {showAdvancedOptions && (
