@@ -28,6 +28,7 @@ if (process.env.NODE_ENV === 'production') {
 // CORS configuration for development and production
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:3001', // Added for gant branch testing
   'http://localhost:3002',
   'https://mirrify-creativespaces.up.railway.app', // Your Railway frontend domain
   'https://mirrify-app-907099703781.us-central1.run.app', // Google Cloud Run frontend
