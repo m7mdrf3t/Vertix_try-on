@@ -36,6 +36,8 @@ gcloud run deploy $SERVICE_NAME \
   --max-instances 10 \
   --set-env-vars NODE_ENV=production \
   --set-env-vars TINYPNG_API_KEY="$TINYPNG_API_KEY" \
+  --set-env-vars NEXT_PUBLIC_SUPABASE_URL="https://euvdpomiybrasicixerw.supabase.co" \
+  --set-env-vars NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1dmRwb21peWJyYXNpY2l4ZXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNDc0OTcsImV4cCI6MjA3NjcyMzQ5N30.T87XjLha8MwBAtJ3K-FfJlZrCB9qKpGoNYg29AAfg5M" \
   --project $PROJECT_ID
 
 echo "✅ Deployment complete!"
@@ -46,5 +48,8 @@ echo "🔍 Health check: https://$SERVICE_NAME-$REGION-$PROJECT_ID.a.run.app/api
 echo "🧪 Testing deployment..."
 curl -s "https://$SERVICE_NAME-$REGION-$PROJECT_ID.a.run.app/api/health" | jq .
 
-echo "🎉 Deployment successful! Sharp compression is now available on Google Cloud Run."
+echo "📊 Testing analytics endpoints..."
+curl -s "https://$SERVICE_NAME-$REGION-$PROJECT_ID.a.run.app/" | jq .endpoints.analytics
+
+echo "🎉 Deployment successful! Analytics dashboard backend is now available on Google Cloud Run."
 

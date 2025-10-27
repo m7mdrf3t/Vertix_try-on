@@ -7,10 +7,16 @@ const path = require('path');
 const tinify = require('tinify');
 const multer = require('multer');
 const { processImageWithSharp, getImageMetadata } = require('./imageProcessor');
+const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://euvdpomiybrasicixerw.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1dmRwb21peWJyYXNpY2l4ZXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNDc0OTcsImV4cCI6MjA3NjcyMzQ5N30.T87XjLha8MwBAtJ3K-FfJlZrCB9qKpGoNYg29AAfg5M';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Google Cloud Run compatibility
 if (process.env.NODE_ENV === 'production') {
@@ -31,25 +37,57 @@ const allowedOrigins = [
   process.env.FRONTEND_URL, // Fallback for environment variable
 ];
 
+// Shopify domains pattern matching
+const isShopifyDomain = (origin) => {
+  if (!origin) return false;
+  
+  // Check for .myshopify.com domains
+  if (origin.match(/^https:\/\/[a-zA-Z0-9-]+\.myshopify\.com$/)) {
+    return true;
+  }
+  
+  // Check for Shopify Pages domains (if using Shopify Pages)
+  if (origin.match(/^https:\/\/[a-zA-Z0-9-]+\.pages\.shopify\.com$/)) {
+    return true;
+  }
+  
+  // Check for custom Shopify domains (you can add specific ones here)
+  const customShopifyDomains = [
+    // Add your specific Shopify custom domains here
+     'https://rzurp0-bj.myshopify.com',
+  ];
+  
+  return customShopifyDomains.includes(origin);
+};
+
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // For production, allow your specific domains
+    // Check if origin is in allowed origins list
     if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      // Log blocked origins for debugging
-      console.log('CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
+      return callback(null, true);
     }
+    
+    // Check if origin is a valid Shopify domain
+    if (isShopifyDomain(origin)) {
+      console.log('CORS allowed Shopify domain:', origin);
+      return callback(null, true);
+    }
+    
+    // Log blocked origins for debugging
+    console.log('CORS blocked origin:', origin);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json({ limit: '50mb' }));
+
+// Serve static files from templates directory
+app.use('/app/static', express.static(path.join(__dirname, 'templates')));
 
 // Configure multer for file uploads
 const upload = multer({ 
@@ -112,7 +150,15 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/api/health',
       auth: '/api/auth/token',
-      tryOn: '/api/try-on'
+      tryOn: '/api/try-on',
+      app: {
+        main: '/app',
+        analytics: '/app/tryon-analytics'
+      },
+      analytics: {
+        registerEvent: '/api/events/register',
+        getEvents: '/api/events'
+      }
     }
   });
 });
@@ -341,6 +387,133 @@ app.post('/api/try-on', async (req, res) => {
     console.error('Error calling Creative spaces API:', error.response?.data || error.message);
     res.status(error.response?.status || 500).json({
       error: error.response?.data?.error?.message || 'Internal server error',
+    });
+  }
+});
+
+// Shopify App Interface Routes
+
+// Main Shopify app interface
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(__dirname, 'templates', 'app.html'));
+});
+
+// Analytics dashboard
+app.get('/app/tryon-analytics', (req, res) => {
+  res.sendFile(path.join(__dirname, 'templates', 'analytics.html'));
+});
+
+// Catch-all for other app routes (for future expansion)
+app.get('/app/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'templates', 'app.html'));
+});
+
+// Analytics endpoints
+
+// Register analytics event
+app.post('/api/events/register', async (req, res) => {
+  try {
+    const { eventType, productId, productTitle, productHandle, timestamp, shop } = req.body;
+
+    // Validate required fields
+    if (!eventType || !shop) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: eventType and shop are required' 
+      });
+    }
+
+    // Prepare event data
+    const eventData = {
+      event_type: eventType,
+      product_id: productId || null,
+      product_title: productTitle || null,
+      product_handle: productHandle || null,
+      timestamp: timestamp ? new Date(timestamp).toISOString() : new Date().toISOString(),
+      shop: shop
+    };
+
+    // Insert event into Supabase
+    const { data, error } = await supabase
+      .from('analytics_events')
+      .insert([eventData])
+      .select();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ 
+        error: 'Failed to register event',
+        details: error.message 
+      });
+    }
+
+    console.log('Event registered successfully:', eventData);
+    res.json({ success: true, eventId: data[0]?.id });
+
+  } catch (error) {
+    console.error('Error registering event:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
+// Get analytics events with filtering
+app.get('/api/events', async (req, res) => {
+  try {
+    const { eventType, startDate, endDate, shop, limit = 100, offset = 0 } = req.query;
+
+    // Build query
+    let query = supabase
+      .from('analytics_events')
+      .select('*')
+      .order('timestamp', { ascending: false })
+      .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+
+    // Apply filters
+    if (eventType) {
+      query = query.eq('event_type', eventType);
+    }
+
+    if (shop) {
+      query = query.eq('shop', shop);
+    }
+
+    if (startDate) {
+      query = query.gte('timestamp', new Date(startDate).toISOString());
+    }
+
+    if (endDate) {
+      query = query.lte('timestamp', new Date(endDate).toISOString());
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ 
+        error: 'Failed to fetch events',
+        details: error.message 
+      });
+    }
+
+    // Transform data to match expected format
+    const events = data.map(event => ({
+      eventType: event.event_type,
+      productId: event.product_id,
+      productTitle: event.product_title,
+      productHandle: event.product_handle,
+      timestamp: event.timestamp,
+      shop: event.shop
+    }));
+
+    res.json(events);
+
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
     });
   }
 });

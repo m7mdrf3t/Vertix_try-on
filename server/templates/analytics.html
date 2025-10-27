@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mirrify Analytics - Virtual Try-On Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f6f6f7;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .nav {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filters {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .filter-group input[type="date"] {
+            min-width: 150px;
+        }
+
+        .btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background: #1565c0;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-card h3 {
+            font-size: 32px;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .events-section {
+            margin-top: 32px;
+        }
+
+        .events-section h2 {
+            color: #2c3e50;
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        .events-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .events-table th,
+        .events-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .events-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .events-table td {
+            font-size: 14px;
+        }
+
+        .event-type {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .event-type.product-selected {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .event-type.generate-tryon {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .event-type.add-to-cart {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 16px 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #f8f9fa;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination button.active {
+            background: #1976d2;
+            color: white;
+            border-color: #1976d2;
+        }
+
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .events-table {
+                font-size: 12px;
+            }
+
+            .events-table th,
+            .events-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Try-On Analytics Dashboard</h1>
+            <p>Track customer engagement and conversion metrics for your virtual try-on feature</p>
+        </div>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="/app">Dashboard</a></li>
+                <li><a href="/app/tryon-analytics" class="active">Analytics</a></li>
+                <li><a href="/app/settings">Settings</a></li>
+                <li><a href="/app/help">Help</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="eventType">Event Type</label>
+                    <select id="eventType">
+                        <option value="">All Events</option>
+                        <option value="product_selected">Product Selected</option>
+                        <option value="generate_tryon">Generate Try-On</option>
+                        <option value="add_to_cart">Add to Cart</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate">
+                </div>
+
+                <div class="filter-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate">
+                </div>
+
+                <div class="filter-group">
+                    <label for="shop">Shop</label>
+                    <input type="text" id="shop" placeholder="e.g., store.myshopify.com">
+                </div>
+
+                <button class="btn" onclick="loadAnalytics()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalEvents">-</h3>
+                    <p>Total Events</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="productSelections">-</h3>
+                    <p>Product Selections</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="tryOnGenerations">-</h3>
+                    <p>Try-On Generations</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="addToCarts">-</h3>
+                    <p>Add to Cart</p>
+                </div>
+            </div>
+
+            <!-- Events Table -->
+            <div class="events-section">
+                <h2>Recent Events</h2>
+                <div id="loadingIndicator" class="loading" style="display: none;">
+                    Loading analytics data...
+                </div>
+                <div id="errorMessage" class="error" style="display: none;"></div>
+                
+                <table class="events-table" id="eventsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Event Type</th>
+                            <th>Product</th>
+                            <th>Shop</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTableBody">
+                    </tbody>
+                </table>
+
+                <div class="pagination" id="pagination" style="display: none;">
+                    <button id="prevBtn" onclick="changePage(-1)">Previous</button>
+                    <span id="pageInfo">Page 1 of 1</span>
+                    <button id="nextBtn" onclick="changePage(1)">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin;
+        let currentPage = 1;
+        let totalPages = 1;
+        const pageSize = 20;
+
+        // Load analytics data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAnalytics();
+        });
+
+        async function loadAnalytics() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorMessage = document.getElementById('errorMessage');
+            const eventsTable = document.getElementById('eventsTable');
+            const eventsTableBody = document.getElementById('eventsTableBody');
+            const pagination = document.getElementById('pagination');
+
+            // Show loading
+            loadingIndicator.style.display = 'block';
+            errorMessage.style.display = 'none';
+            eventsTable.style.display = 'none';
+            pagination.style.display = 'none';
+
+            try {
+                // Get filter values
+                const eventType = document.getElementById('eventType').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const shop = document.getElementById('shop').value;
+
+                // Build query parameters
+                const params = new URLSearchParams({
+                    limit: pageSize,
+                    offset: (currentPage - 1) * pageSize
+                });
+
+                if (eventType) params.append('eventType', eventType);
+                if (startDate) params.append('startDate', startDate);
+                if (endDate) params.append('endDate', endDate);
+                if (shop) params.append('shop', shop);
+
+                // Fetch events
+                const response = await fetch(`${API_BASE_URL}/api/events?${params}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const events = await response.json();
+
+                // Update statistics
+                updateStatistics(events);
+
+                // Update events table
+                updateEventsTable(events);
+
+                // Show table
+                eventsTable.style.display = 'table';
+                pagination.style.display = 'flex';
+
+                // Update pagination
+                totalPages = Math.ceil(events.length / pageSize);
+                updatePagination();
+
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                errorMessage.textContent = `Error loading analytics: ${error.message}`;
+                errorMessage.style.display = 'block';
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        function updateStatistics(events) {
+            const totalEvents = events.length;
+            const productSelections = events.filter(e => e.eventType === 'product_selected').length;
+            const tryOnGenerations = events.filter(e => e.eventType === 'generate_tryon').length;
+            const addToCarts = events.filter(e => e.eventType === 'add_to_cart').length;
+
+            document.getElementById('totalEvents').textContent = totalEvents;
+            document.getElementById('productSelections').textContent = productSelections;
+            document.getElementById('tryOnGenerations').textContent = tryOnGenerations;
+            document.getElementById('addToCarts').textContent = addToCarts;
+        }
+
+        function updateEventsTable(events) {
+            const tbody = document.getElementById('eventsTableBody');
+            tbody.innerHTML = '';
+
+            events.forEach(event => {
+                const row = document.createElement('tr');
+                
+                const eventTypeClass = event.eventType.replace('_', '-');
+                const eventTypeDisplay = event.eventType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                row.innerHTML = `
+                    <td>
+                        <span class="event-type ${eventTypeClass}">${eventTypeDisplay}</span>
+                    </td>
+                    <td>
+                        ${event.productTitle || event.productHandle || 'N/A'}
+                        ${event.productId ? `<br><small>ID: ${event.productId}</small>` : ''}
+                    </td>
+                    <td>${event.shop || 'N/A'}</td>
+                    <td>${new Date(event.timestamp).toLocaleString()}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function updatePagination() {
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+            prevBtn.disabled = currentPage <= 1;
+            nextBtn.disabled = currentPage >= totalPages;
+        }
+
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                loadAnalytics();
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('eventType').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('shop').value = '';
+            currentPage = 1;
+            loadAnalytics();
+        }
+
+        // Set default date range to last 30 days
+        document.addEventListener('DOMContentLoaded', function() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+
+            document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+            document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
+

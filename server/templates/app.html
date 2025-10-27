@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mirrify - Virtual Try-On App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f6f6f7;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .nav {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .welcome-section h2 {
+            color: #2c3e50;
+            margin-bottom: 16px;
+            font-size: 24px;
+        }
+
+        .welcome-section p {
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 16px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #1976d2;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .cta-button:hover {
+            background: #1565c0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .nav ul {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="status-indicator"></span>Mirrify Virtual Try-On</h1>
+            <p>AI-powered virtual try-on technology for your Shopify store</p>
+        </div>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="/app" class="active">Dashboard</a></li>
+                <li><a href="/app/tryon-analytics">Analytics</a></li>
+                <li><a href="/app/settings">Settings</a></li>
+                <li><a href="/app/help">Help</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <div class="welcome-section">
+                <h2>Welcome to Mirrify</h2>
+                <p>Transform your customers' shopping experience with our advanced virtual try-on technology.</p>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>🎯 Virtual Try-On</h3>
+                        <p>Let customers see how clothes look on them before purchasing using AI technology.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>📊 Analytics</h3>
+                        <p>Track customer engagement and conversion rates with detailed analytics.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>⚡ Fast Processing</h3>
+                        <p>Quick image processing and real-time try-on results for better user experience.</p>
+                    </div>
+                </div>
+
+                <a href="/app/tryon-analytics" class="cta-button">View Analytics Dashboard</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Mirrify. All rights reserved. | <a href="/app/help" style="color: #1976d2;">Support</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Simple client-side functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Mirrify app loaded successfully');
+            
+            // Add any client-side functionality here
+            // For example, checking if we're in Shopify admin context
+            if (window.parent !== window) {
+                console.log('Running inside Shopify admin');
+            }
+        });
+    </script>
+</body>
+</html>
+
