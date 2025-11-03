@@ -1,6 +1,7 @@
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { Product } from '../types';
+import { getBackendUrl } from '../config/backend';
 
 export interface CSVProduct {
   id: string;
@@ -79,7 +80,11 @@ export class CSVService {
         csvUrl = csvUrl.replace('/edit', '/export?format=csv&gid=0');
       }
       
-      const response = await fetch(csvUrl);
+      // Use backend proxy to avoid CORS issues with Google Sheets
+      const backendUrl = getBackendUrl();
+      const proxiedUrl = `${backendUrl}/api/proxy-csv?url=${encodeURIComponent(csvUrl)}`;
+      
+      const response = await fetch(proxiedUrl);
       if (!response.ok) {
         throw new Error(`Failed to fetch Google Sheets: ${response.status}`);
       }

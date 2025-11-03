@@ -1,3 +1,5 @@
+import { getBackendUrl } from '../config/backend';
+
 /**
  * Compresses an image using TinyPNG API through backend proxy
  * @param file - The original image file
@@ -13,8 +15,8 @@ export const compressImageWithTinyPNG = async (
       // Convert file to base64
       const base64 = await fileToBase64(file);
       
-      // Get API base URL
-      const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-backend-907099703781.us-central1.run.app';
+      // Get API base URL from backend configuration
+      const API_BASE_URL = getBackendUrl();
       
       // Call TinyPNG compression endpoint
       const response = await fetch(`${API_BASE_URL}/api/compress-image`, {

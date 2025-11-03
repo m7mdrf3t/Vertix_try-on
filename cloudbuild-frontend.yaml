@@ -1,0 +1,18 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-f'
+      - 'Dockerfile.static'
+      - '--build-arg'
+      - 'REACT_APP_API_URL=https://mirrify-backend-v2-907099703781.us-central1.run.app'
+      - '-t'
+      - 'gcr.io/neat-cycling-470410-t9/mirrify-frontend-v2'
+      - '.'
+  # Push the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/neat-cycling-470410-t9/mirrify-frontend-v2']
+images:
+  - 'gcr.io/neat-cycling-470410-t9/mirrify-frontend-v2'
+

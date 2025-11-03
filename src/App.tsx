@@ -5,6 +5,7 @@ import { ProcessingStatus } from './components/ProcessingStatus';
 import { AdvancedOptions } from './components/AdvancedOptions';
 import { VirtualTryOnAPI } from './services/api';
 import { UploadedImage, Product, ProcessingState, TryOnParameters } from './types';
+import { getBackendUrl } from './config/backend';
 
 function App() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
@@ -57,7 +58,21 @@ function App() {
 
   // Helper function to convert image URL to base64
   const convertImageUrlToBase64 = async (imageUrl: string): Promise<string> => {
-    const response = await fetch(imageUrl);
+    // Check if it's an external URL (starts with http:// or https://)
+    // and use proxy to avoid CORS issues
+    let fetchUrl = imageUrl;
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      // Skip proxy if it's already a data URL or if it's already proxied
+      if (!imageUrl.includes('/api/proxy-image?')) {
+        const API_BASE_URL = getBackendUrl();
+        fetchUrl = `${API_BASE_URL}/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+      }
+    }
+    
+    const response = await fetch(fetchUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
     const blob = await response.blob();
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

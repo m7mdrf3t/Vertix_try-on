@@ -32,6 +32,10 @@ const allowedOrigins = [
   'https://mirrify-creativespaces.up.railway.app', // Your Railway frontend domain
   'https://mirrify-app-907099703781.us-central1.run.app', // Google Cloud Run frontend
   'https://mirrify-frontend-907099703781.us-central1.run.app', // Current Google Cloud Run frontend
+  'https://mirrify-frontend-v2-907099703781.us-central1.run.app', // NEW Frontend v2
+  'https://mirrify-multi-907099703781.us-central1.run.app', // Mirrify multi-service
+  'https://gant.eg', // Gant website
+  'http://gant.eg', // Gant website (HTTP)
   'https://www.creativespaces.tech', // Creative Spaces production domain (with www)
   'https://creativespaces.tech', // Creative Spaces production domain (without www)
   process.env.FRONTEND_URL, // Fallback for environment variable
@@ -283,6 +287,35 @@ app.get('/api/proxy-image', async (req, res) => {
   } catch (error) {
     console.error('Error proxying image:', error.message);
     res.status(500).json({ error: 'Failed to load image' });
+  }
+});
+
+// Proxy endpoint for CSV/Google Sheets to handle CORS
+app.get('/api/proxy-csv', async (req, res) => {
+  try {
+    const csvUrl = req.query.url;
+    if (!csvUrl) {
+      return res.status(400).json({ error: 'CSV URL is required' });
+    }
+
+    const response = await axios.get(csvUrl, {
+      responseType: 'text',
+      timeout: 30000,
+    });
+
+    // Set CORS headers
+    res.set({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
+    });
+
+    res.send(response.data);
+  } catch (error) {
+    console.error('Error proxying CSV:', error.message);
+    res.status(500).json({ error: 'Failed to load CSV' });
   }
 });
 

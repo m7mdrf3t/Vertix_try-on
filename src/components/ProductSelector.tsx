@@ -1,13 +1,14 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Check, ShoppingBag, ChevronDown, X } from 'lucide-react';
 import { CSVService } from '../services/csvService';
+import { getBackendUrl } from '../config/backend';
 
 // Helper function to determine if image is a URL or local path
 const getImageSrc = (imagePath: string): string => {
   // Check if it's a URL (starts with http:// or https://)
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
     // Use proxy for external URLs to handle CORS
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-backend-907099703781.us-central1.run.app';
+    const API_BASE_URL = getBackendUrl();
     return `${API_BASE_URL}/api/proxy-image?url=${encodeURIComponent(imagePath)}`;
   }
   // Check if it's a data URL (starts with data:)

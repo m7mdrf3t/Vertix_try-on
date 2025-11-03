@@ -1,11 +1,15 @@
 import axios from 'axios';
 import { PredictionRequest, PredictionResponse } from '../types';
+import { getBackendUrl, getPreviousBackendUrl } from '../config/backend';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-backend-907099703781.us-central1.run.app';
+// Get backend URL from configuration (supports easy switching)
+const API_BASE_URL = getBackendUrl();
+const PREVIOUS_API_BASE_URL = getPreviousBackendUrl();
 
-// Debug: Log the API URL being used
-console.log('API_BASE_URL:', API_BASE_URL);
-console.log('Environment variable:', process.env.REACT_APP_API_URL);
+// Debug: Log the API URLs being used
+console.log('🔗 Current API_BASE_URL:', API_BASE_URL);
+console.log('🔄 Previous API_BASE_URL (for rollback):', PREVIOUS_API_BASE_URL);
+console.log('📝 Environment variable:', process.env.REACT_APP_API_URL);
 
 export class VirtualTryOnAPI {
   static async predict(request: PredictionRequest): Promise<PredictionResponse> {

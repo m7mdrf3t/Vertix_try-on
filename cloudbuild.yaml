@@ -1,0 +1,10 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'Dockerfile.static', '-t', 'gcr.io/neat-cycling-470410-t9/mirrify-multi', '.']
+  # Push the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/neat-cycling-470410-t9/mirrify-multi']
+images:
+  - 'gcr.io/neat-cycling-470410-t9/mirrify-multi'
+

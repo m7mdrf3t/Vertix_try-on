@@ -1,3 +1,5 @@
+import { getBackendUrl } from '../config/backend';
+
 /**
  * Sharp-based image processing service
  * Uses backend Sharp processing for advanced features
@@ -20,7 +22,9 @@ export interface ImageMetadata {
 }
 
 export class SharpImageService {
-  private static API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mirrify-backend-907099703781.us-central1.run.app';
+  private static getAPI_BASE_URL(): string {
+    return getBackendUrl();
+  }
 
   /**
    * Process image using Sharp backend
@@ -56,7 +60,7 @@ export class SharpImageService {
       });
 
       // Send to backend for processing
-      const response = await fetch(`${this.API_BASE_URL}/api/process-image`, {
+      const response = await fetch(`${this.getAPI_BASE_URL()}/api/process-image`, {
         method: 'POST',
         body: formData,
       });
@@ -111,7 +115,7 @@ export class SharpImageService {
       const formData = new FormData();
       formData.append('image', file);
 
-      const response = await fetch(`${this.API_BASE_URL}/api/image-metadata`, {
+      const response = await fetch(`${this.getAPI_BASE_URL()}/api/image-metadata`, {
         method: 'POST',
         body: formData,
       });

@@ -1,0 +1,11 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'Dockerfile.google', '-t', 'gcr.io/neat-cycling-470410-t9/mirrify-backend-v2', '.']
+    dir: 'server'
+  # Push the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/neat-cycling-470410-t9/mirrify-backend-v2']
+images:
+  - 'gcr.io/neat-cycling-470410-t9/mirrify-backend-v2'
+

@@ -3,20 +3,16 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Accept build argument for API URL
-ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=$REACT_APP_API_URL
-
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (need dev dependencies for build)
-RUN npm ci
+# Install dependencies
+RUN npm ci --only=production
 
 # Copy source code
 COPY . .
 
-# Build the React app with the API URL
+# Build the React app
 RUN npm run build
 
 # Copy the serve script
