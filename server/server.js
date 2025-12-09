@@ -404,7 +404,7 @@ app.post('/api/try-on', async (req, res) => {
     const accessToken = await getAccessToken();
     
     const response = await axios.post(
-      `https://us-central1-aiplatform.googleapis.com/v1/projects/neat-cycling-470410-t9/locations/us-central1/publishers/google/models/virtual-try-on-preview-08-04:predict`, 
+      `https://us-central1-aiplatform.googleapis.com/v1/projects/${process.env.GOOGLE_PROJECT_ID || 'tryandfit'}/locations/us-central1/publishers/google/models/virtual-try-on-preview-08-04:predict`, 
       req.body,
       {
         headers: {

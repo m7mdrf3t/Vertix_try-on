@@ -6,7 +6,7 @@
 set -e
 
 # Configuration - NEW FRONTEND SERVICE
-PROJECT_ID="neat-cycling-470410-t9"
+PROJECT_ID="tryandfit"
 SERVICE_NAME="mirrify-frontend-v2"
 REGION="us-central1"
 IMAGE_NAME="gcr.io/$PROJECT_ID/$SERVICE_NAME"

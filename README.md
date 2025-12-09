@@ -69,7 +69,7 @@ Mirrify/
    GOOGLE_PROJECT_ID=your-project-id
    GOOGLE_LOCATION=us-central1
    GOOGLE_MODEL_ID=your-model-id
-   GOOGLE_APPLICATION_CREDENTIALS=./neat-cycling-470410-t9-cf1a586a416b.json
+   GOOGLE_APPLICATION_CREDENTIALS=./YOUR_NEW_CREDENTIALS_FILE.json
    ```
 
 5. **Start the backend server**

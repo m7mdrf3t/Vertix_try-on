@@ -14,7 +14,7 @@ services:
       - GOOGLE_MODEL_ID=${GOOGLE_MODEL_ID}
       - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
     volumes:
-      - ./server/neat-cycling-470410-t9-cf1a586a416b.json:/app/credentials.json:ro
+      - ./server/YOUR_NEW_CREDENTIALS_FILE.json:/app/credentials.json:ro
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       interval: 30s

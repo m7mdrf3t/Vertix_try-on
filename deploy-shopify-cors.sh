@@ -6,7 +6,7 @@
 echo "🚀 Deploying Mirrify Backend with Shopify CORS Support..."
 
 # Set your project ID
-PROJECT_ID="neat-cycling-470410-t9"
+PROJECT_ID="tryandfit"
 SERVICE_NAME="mirrify-backend"
 REGION="us-central1"
 
