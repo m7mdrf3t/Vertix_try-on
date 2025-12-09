@@ -1,5 +1,5 @@
 steps:
-  # Build the container image
+  # Build the container image from server directory
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-f', 'server/Dockerfile.google', '-t', 'gcr.io/tryandfit/mirrify-backend-v2', 'server']
   # Push the container image

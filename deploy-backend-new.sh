@@ -15,14 +15,15 @@ echo "🚀 Deploying Mirrify Backend to NEW Google Cloud Run service..."
 echo "📦 Service Name: $SERVICE_NAME"
 echo "🌍 Region: $REGION"
 
-# Build the Docker image
-echo "📦 Building Docker image..."
-cd server
-docker build -f Dockerfile.google -t $IMAGE_NAME .
+# Build the Docker image using Cloud Build
+echo "📦 Building Docker image using Cloud Build..."
+# Run from root directory - cloudbuild-backend.yaml is in root
+gcloud builds submit --config cloudbuild-backend.yaml --project $PROJECT_ID .
 
-# Push to Google Container Registry
-echo "⬆️ Pushing image to Google Container Registry..."
-docker push $IMAGE_NAME
+# Alternative: If you prefer using Docker directly (requires Docker installed):
+# cd server
+# docker build -f Dockerfile.google -t $IMAGE_NAME .
+# docker push $IMAGE_NAME
 
 # Deploy to Cloud Run
 echo "🚀 Deploying to Cloud Run..."
