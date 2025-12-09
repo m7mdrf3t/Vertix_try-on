@@ -7,4 +7,6 @@ steps:
     args: ['push', 'gcr.io/tryandfit/mirrify-backend-v2']
 images:
   - 'gcr.io/tryandfit/mirrify-backend-v2'
+options:
+  logging: CLOUD_LOGGING_ONLY
 
