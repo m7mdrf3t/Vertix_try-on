@@ -6,7 +6,7 @@ steps:
       - '-f'
       - 'Dockerfile.static'
       - '--build-arg'
-      - 'REACT_APP_API_URL=https://mirrify-backend-v2-907099703781.us-central1.run.app'
+      - 'REACT_APP_API_URL=https://mirrify-backend-v2-cafok76baq-uc.a.run.app'
       - '-t'
       - 'gcr.io/tryandfit/mirrify-frontend-v2'
       - '.'

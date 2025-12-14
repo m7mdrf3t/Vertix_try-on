@@ -7,8 +7,8 @@
 
 export const BACKEND_CONFIG = {
   // Current active backend (new deployment)
-  // NEW Backend: https://mirrify-backend-v2-907099703781.us-central1.run.app
-  CURRENT: process.env.REACT_APP_API_URL || 'https://mirrify-backend-v2-907099703781.us-central1.run.app',
+  // NEW Backend: https://mirrify-backend-v2-cafok76baq-uc.a.run.app
+  CURRENT: process.env.REACT_APP_API_URL || 'https://mirrify-backend-v2-cafok76baq-uc.a.run.app',
   
   // Previous backend (kept for rollback/fallback)
   // OLD Backend: https://mirrify-backend-907099703781.us-central1.run.app

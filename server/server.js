@@ -32,7 +32,9 @@ const allowedOrigins = [
   'https://mirrify-creativespaces.up.railway.app', // Your Railway frontend domain
   'https://mirrify-app-907099703781.us-central1.run.app', // Google Cloud Run frontend
   'https://mirrify-frontend-907099703781.us-central1.run.app', // Current Google Cloud Run frontend
-  'https://mirrify-frontend-v2-907099703781.us-central1.run.app', // NEW Frontend v2
+  'https://mirrify-frontend-v2-907099703781.us-central1.run.app', // OLD Frontend v2 URL
+  'https://mirrify-frontend-v2-cafok76baq-uc.a.run.app', // NEW Frontend v2 (current)
+  'https://mirrify-frontend-v2-338398090136.us-central1.run.app', // Frontend v2 (alternative format)
   'https://mirrify-multi-907099703781.us-central1.run.app', // Mirrify multi-service
   'https://gant.eg', // Gant website
   'http://gant.eg', // Gant website (HTTP)
@@ -85,8 +87,10 @@ app.use(cors({
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Length', 'Content-Type'],
+  maxAge: 86400 // 24 hours
 }));
 app.use(express.json({ limit: '50mb' }));
 

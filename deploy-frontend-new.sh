@@ -32,7 +32,7 @@ gcloud run deploy $SERVICE_NAME \
   --concurrency 80 \
   --max-instances 10 \
   --set-env-vars NODE_ENV=production \
-  --set-env-vars REACT_APP_API_URL="https://mirrify-backend-v2-907099703781.us-central1.run.app" \
+  --set-env-vars REACT_APP_API_URL="https://mirrify-backend-v2-cafok76baq-uc.a.run.app" \
   --project $PROJECT_ID
 
 # Get the actual service URL from gcloud
@@ -57,7 +57,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "📝 DEPLOYMENT URLS:"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🆕 NEW Frontend: $NEW_SERVICE_URL"
-echo "🆕 NEW Backend:  https://mirrify-backend-v2-907099703781.us-central1.run.app"
+echo "🆕 NEW Backend:  https://mirrify-backend-v2-cafok76baq-uc.a.run.app"
 echo "🔄 OLD Frontend: https://mirrify-frontend-quniks2hyq-uc.a.run.app"
 echo "🔄 OLD Backend:  https://mirrify-backend-quniks2hyq-uc.a.run.app"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
